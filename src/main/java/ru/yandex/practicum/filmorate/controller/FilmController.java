@@ -12,11 +12,7 @@ import ru.yandex.practicum.filmorate.util.IdGenerator;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/films")
@@ -26,8 +22,8 @@ public class FilmController {
     private static final LocalDate EARLIEST_DATE = LocalDate.of(1895, Month.DECEMBER, 28);
 
     @PostMapping()
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
-        validateReleaseDateAndDuration(film);
+    public ResponseEntity<Film> addFilm(@RequestBody Film film) {
+        validateFilm(film);
 
         film.setId(getMaxId());
         film.setDuration(film.getDuration().multipliedBy(60));
@@ -42,7 +38,7 @@ public class FilmController {
 
     @PutMapping()
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
-        validateReleaseDateAndDuration(film);
+        validateFilm(film);
 
         Film filmToUpdate = Optional.ofNullable(films.get(film.getId()))
                 .orElseThrow(() -> new NotFoundException("Не найден фильм с id: " + film.getId()));
@@ -53,24 +49,37 @@ public class FilmController {
         if (film.getName() != null) {
             filmToUpdate.setName(film.getName());
         }
+        if (film.getDuration() != null) {
+            filmToUpdate.setDuration(film.getDuration());
+        }
+        if (film.getReleaseDate() != null) {
+            filmToUpdate.setReleaseDate(film.getReleaseDate());
+        }
         films.put(filmToUpdate.getId(), filmToUpdate);
         return ResponseEntity.of(Optional.of(films.get(film.getId())));
     }
 
-    private void validateReleaseDateAndDuration(Film film) {
+    private void validateFilm(Film film) {
         log.warn("Валидация фильма {}", film.getName());
+
+        log.warn("Валидация имени {}", film.getName());
+        if (film.getName().isEmpty()) {
+            throw new ValidationException("Название фильма не может быть пустым");
+        }
+
+        log.warn("Валидация описания {}", film.getDescription());
+        if (film.getDescription().length() > 200) {
+            throw new ValidationException("Описание фильма не может быть длиннее 200 символов");
+        }
 
         log.warn("Валидация даты релиза {}", film.getReleaseDate());
         if (film.getReleaseDate().isBefore(EARLIEST_DATE)) {
             throw new ValidationException("Дата релиза фильма слишком старая");
         }
+
         log.warn("Валидация продолжительности {}", film.getDuration());
         if (film.getDuration().isNegative()) {
             throw new ValidationException("Продолжительность фильма не может быть ниже нуля");
-        }
-        log.warn("Валидация описания {}", film.getDescription());
-        if (film.getDescription().length() > 200) {
-            throw new ValidationException("Описание фильма не может быть длиннее 200 символов");
         }
 
         log.info("Успешная валидация фильма {}", film.getName());

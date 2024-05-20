@@ -35,7 +35,7 @@ public class User {
     private LocalDate birthday;
 
     @JsonCreator()
-    private static User decodeUser(
+    private static User createUserJson(
             @JsonProperty("id") Long id,
             @JsonProperty("email") String email,
             @JsonProperty("login") String login,

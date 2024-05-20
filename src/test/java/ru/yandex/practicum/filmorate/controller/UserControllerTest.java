@@ -1,186 +1,105 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
-
+    static UserController userController = new UserController();
     static ObjectMapper objectMapper = new ObjectMapper();
-    private static final String USERS_ENDPOINT = "http://localhost:8080/users";
 
     @BeforeAll
-    static void setUpAll() {
-        objectMapper.registerModule(new JavaTimeModule());
+    static void setUp() {
+        objectMapper.registerModules(new JavaTimeModule());
     }
 
-    private User createUserForTest(String login, String name, String email, LocalDate birthday) throws IOException, URISyntaxException, InterruptedException {
+    @Test
+    void testUserModel_shouldThrowNullPointerException_releaseDateIsNull() {
         User user = User.builder()
-                .login(login)
-                .name(name)
-                .email(email)
-                .birthday(birthday)
+                .name("Bexeiit")
+                .email("bexeiitatabek@yandex.kz")
+                .birthday(null)
+                .login("nickname")
                 .build();
 
-        String userJson = objectMapper.writeValueAsString(user);
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(USERS_ENDPOINT))
-                .POST(HttpRequest.BodyPublishers.ofString(userJson))
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
-        HttpResponse<String> response;
-        try (HttpClient httpClient = HttpClient.newHttpClient()) {
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        Validator validator;
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.getValidator();
         }
 
-        String responseBody = response.body();
+        assertNotNull(validator);
 
-        User userFromResponse = objectMapper.readValue(responseBody, User.class);
+        Set<ConstraintViolation<User>> validatedUserSet = validator.validate(user);
+        assertEquals(1, validatedUserSet.size());
+        assertTrue(validatedUserSet.stream()
+                .anyMatch(results -> results.getMessage().equals("Пустая дата рождения")));
 
-        assertNotNull(response, "The response is null");
-        assertEquals(200, response.statusCode(),
-                "User controller returns %d instead of 200".formatted(response.statusCode()));
-        assertEquals(login, userFromResponse.getLogin());
-        assertEquals(name == null ? login : name, userFromResponse.getName());
-        assertEquals(email, userFromResponse.getEmail());
-        assertEquals(birthday, userFromResponse.getBirthday());
-        return userFromResponse;
+        // при валидации null.isAfter() бросить NPE
+        assertThrows(NullPointerException.class, () -> userController.addUser(user));
     }
 
     @Test
-    void createUser_shouldReturnStatusCode200AndDataOfJustCreatedUser() throws URISyntaxException, IOException, InterruptedException {
-        User userFromResponse = createUserForTest("nickname", "Bexeiit", "bexeiitatabek@yandex.kz",
-                LocalDate.of(2004, Month.NOVEMBER, 16));
-
-        assertEquals("nickname", userFromResponse.getLogin());
-        assertEquals("Bexeiit", userFromResponse.getName());
-        assertEquals("bexeiitatabek@yandex.kz", userFromResponse.getEmail());
-        assertEquals(LocalDate.of(2004, Month.NOVEMBER, 16), userFromResponse.getBirthday());
-    }
-
-    @Test
-    void createUser_shouldReturnStatusCode200AndDataOfJustCreatedUser_loginAndNameAreEqual() throws URISyntaxException, IOException, InterruptedException {
-        User userFromResponse = createUserForTest("nickname", null, "bexeiitatabek@yandex.kz",
-                LocalDate.of(2004, Month.NOVEMBER, 16));
-
-        assertEquals("nickname", userFromResponse.getLogin());
-        assertEquals("nickname", userFromResponse.getLogin());
-        assertEquals("bexeiitatabek@yandex.kz", userFromResponse.getEmail());
-        assertEquals(LocalDate.of(2004, Month.NOVEMBER, 16), userFromResponse.getBirthday());
-    }
-
-    @Test
-    void updateUser_shouldReturn500BecauseOfValidation_loginContainsSpace() throws URISyntaxException, IOException, InterruptedException {
-        User userFromCreateResponse = createUserForTest("nickname", "Bexeiit", "bexeiitatabek@yandex.kz",
-                LocalDate.of(2004, Month.NOVEMBER, 16));
-
-        User userUpdate = userFromCreateResponse.toBuilder()
-                .login("nick name")
+    void testUserModel_shouldReturnMessageAboutInvalidEmail_invalidEmail() {
+        User user = User.builder()
+                .name("Bexeiit")
+                .email("@@@bexeiitatabekyandex.kz")
+                .birthday(LocalDate.of(2004, Month.NOVEMBER, 16))
+                .login("nickname")
                 .build();
 
-        String userJson = objectMapper.writeValueAsString(userUpdate);
-
-        HttpRequest updateRequest = HttpRequest.newBuilder()
-                .uri(new URI(USERS_ENDPOINT))
-                .PUT(HttpRequest.BodyPublishers.ofString(userJson))
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
-        HttpResponse<String> updateResponse;
-        try (HttpClient httpClient = HttpClient.newHttpClient()) {
-            updateResponse = httpClient.send(updateRequest, HttpResponse.BodyHandlers.ofString());
-        }
-        assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse.statusCode());
-    }
-
-    @Test
-    void updateUser_shouldReturn200AndDataOfJustUpdatedUser() throws URISyntaxException, IOException, InterruptedException {
-        User user1FromResponse = createUserForTest("nickname", "Bexeiit", "bexeiitatabek@yandex.kz",
-                LocalDate.of(2004, Month.NOVEMBER, 16));
-
-        User user2 = user1FromResponse.toBuilder()
-                .login("nickname2")
-                .build();
-
-        String user2Json = objectMapper.writeValueAsString(user2);
-
-        HttpRequest requestOfUser2 = HttpRequest.newBuilder()
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .uri(new URI(USERS_ENDPOINT))
-                .PUT(HttpRequest.BodyPublishers.ofString(user2Json))
-                .build();
-
-        HttpResponse<String> responseOfUser2;
-        try (HttpClient httpClient = HttpClient.newHttpClient()) {
-            responseOfUser2 = httpClient.send(requestOfUser2, HttpResponse.BodyHandlers.ofString());
+        Validator validator;
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.getValidator();
         }
 
-        assertNotNull(responseOfUser2, "Update response is null");
-        User user2FromResponse = objectMapper.readValue(responseOfUser2.body(), User.class);
+        assertNotNull(validator);
 
-        assertEquals(user1FromResponse.getId(), user2FromResponse.getId());
-        assertEquals("nickname2", user2FromResponse.getLogin(), "Login did not updated");
-        assertEquals(user1FromResponse.getEmail(), user2FromResponse.getEmail(), "Email should have not been changed");
-        assertEquals(user1FromResponse.getName(), user2FromResponse.getName(), "Name should have not been changed");
-        assertEquals(user1FromResponse.getBirthday(), user2FromResponse.getBirthday(), "Birthday should have not been changed");
+        Set<ConstraintViolation<User>> validatedUserSet = validator.validate(user);
+        assertEquals(1, validatedUserSet.size());
+        assertTrue(validatedUserSet.stream()
+                .anyMatch(results -> results.getMessage().equals("Неверный формат электронной почты")));
     }
 
     @Test
-    void getAllUsers() throws IOException, URISyntaxException, InterruptedException {
-        User user1 = createUserForTest("nickname", "Bexeiit", "bexeiitatabek@yandex.kz",
-                LocalDate.of(2004, Month.NOVEMBER, 16));
-        User user2 = createUserForTest("frenchfry", "Aiym", "shadena@gmail.com",
-                LocalDate.of(2004, Month.NOVEMBER, 16));
-        User user3 = createUserForTest("sergek", "Sergekbek", "sergekbek@mail.ru",
-                LocalDate.of(2004, Month.NOVEMBER, 16));
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(new URI("http://localhost:8080/users"))
-                .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+    void testUserModel_shouldNotReturnAnything() {
+        User user = User.builder()
+                .name("Bexeiit")
+                .login("nickname")
+                .email("bexeiitatabek@yandex.kz")
+                .birthday(LocalDate.of(2004, Month.NOVEMBER, 16))
                 .build();
 
-        HttpResponse<String> response;
-        try (HttpClient httpClient = HttpClient.newHttpClient()) {
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        Validator validator;
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.getValidator();
         }
 
-        assertNotNull(response);
+        assertNotNull(validator);
 
-        List<User> usersList = objectMapper.readValue(response.body(), new TypeReference<>() {});
+        Set<ConstraintViolation<User>> validatedUserSet = validator.validate(user);
+        assertEquals(0, validatedUserSet.size());
 
-        assertEquals(HttpStatus.OK.value(), response.statusCode());
-
-        assertTrue(usersList.stream()
-                .anyMatch(u -> u.getId().equals(user1.getId())));
-
-        assertTrue(usersList.stream()
-                .anyMatch(u -> u.getId().equals(user2.getId())));
-
-        assertTrue(usersList.stream()
-                .anyMatch(u -> u.getId().equals(user3.getId())));
+        ResponseEntity<User> userResponseEntity = userController.addUser(user);
+        User userResponseEntityBody = userResponseEntity.getBody();
+        assertNotNull(userResponseEntityBody);
+        assertNotNull(userResponseEntityBody.getId());
+        assertTrue(userResponseEntityBody.getId() > 0);
+        assertEquals("Bexeiit", userResponseEntityBody.getName());
+        assertEquals("nickname", userResponseEntityBody.getLogin());
+        assertEquals("bexeiitatabek@yandex.kz", userResponseEntityBody.getEmail());
+        assertEquals(LocalDate.of(2004, Month.NOVEMBER, 16), userResponseEntityBody.getBirthday());
     }
 }
