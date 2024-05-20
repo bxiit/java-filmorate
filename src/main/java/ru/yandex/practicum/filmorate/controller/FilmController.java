@@ -26,7 +26,6 @@ public class FilmController {
         validateFilm(film);
 
         film.setId(getMaxId());
-        film.setDuration(film.getDuration().multipliedBy(60));
         films.put(film.getId(), film);
         return new ResponseEntity<>(films.get(film.getId()), HttpStatus.CREATED);
     }
