@@ -13,7 +13,12 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.util.IdGenerator;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -92,6 +97,6 @@ public class UserController {
     }
 
     private Long getMaxId() {
-        return IdGenerator.getMaxIdOfMap(users.keySet());
+        return IdGenerator.getMaxIdOfUsers(users.keySet());
     }
 }

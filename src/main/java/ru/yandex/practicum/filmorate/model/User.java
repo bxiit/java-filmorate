@@ -14,22 +14,17 @@ import java.time.LocalDate;
 @Data
 @Builder(toBuilder = true)
 public class User {
-    @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("email")
     @NotNull(message = "Пустой адрес электронной почты")
     @Email(message = "Неверный формат электронной почты")
     private String email;
 
-    @JsonProperty("login")
     @NotEmpty(message = "Пустой логин")
     private String login;
 
-    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("birthday")
     @NotNull(message = "Пустая дата рождения")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthday;

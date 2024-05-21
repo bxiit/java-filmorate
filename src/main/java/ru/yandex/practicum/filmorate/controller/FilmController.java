@@ -12,7 +12,11 @@ import ru.yandex.practicum.filmorate.util.IdGenerator;
 
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/films")
@@ -85,6 +89,6 @@ public class FilmController {
     }
 
     private Long getMaxId() {
-        return IdGenerator.getMaxIdOfMap(films.keySet());
+        return IdGenerator.getMaxIdOfFilms(films.keySet());
     }
 }

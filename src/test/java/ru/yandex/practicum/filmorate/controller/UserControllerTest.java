@@ -102,4 +102,32 @@ class UserControllerTest {
         assertEquals("bexeiitatabek@yandex.kz", userResponseEntityBody.getEmail());
         assertEquals(LocalDate.of(2004, Month.NOVEMBER, 16), userResponseEntityBody.getBirthday());
     }
+
+    @Test
+    void testUsersIds_shouldReturnSequencedIds() {
+        User user = User.builder()
+                .name("testId name")
+                .login("testId-login")
+                .email("testId@gmail.com")
+                .birthday(LocalDate.now())
+                .build();
+
+        ResponseEntity<User> userResponseEntity = userController.addUser(user);
+        User userFromBody = userResponseEntity.getBody();
+        assertNotNull(userFromBody);
+        assertNotNull(userFromBody.getId());
+        assertTrue(userFromBody.getId() > 0);
+
+        User user1 = user.toBuilder()
+                .email("testId2@gmail.com")
+                .build();
+        ResponseEntity<User> userResponseEntity1 = userController.addUser(user1);
+        User user1FromBody = userResponseEntity1.getBody();
+        assertNotNull(user1FromBody);
+        assertNotNull(user1FromBody.getId());
+        assertTrue(user1FromBody.getId() > 0);
+
+        assertTrue(userFromBody.getId() < user1FromBody.getId());
+        assertEquals(userFromBody.getId() + 1, user1FromBody.getId());
+    }
 }
