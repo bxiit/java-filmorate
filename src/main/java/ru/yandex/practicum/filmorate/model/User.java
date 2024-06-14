@@ -10,6 +10,8 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
@@ -29,8 +31,10 @@ public class User {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthday;
 
+    private Set<Long> friends;
+
     @JsonCreator()
-    private static User createUserJson(
+    private static User userJson(
             @JsonProperty("id") Long id,
             @JsonProperty("email") String email,
             @JsonProperty("login") String login,
@@ -43,6 +47,7 @@ public class User {
                 .name(name)
                 .email(email)
                 .birthday(birthday)
+                .friends(new HashSet<>())
                 .build();
     }
 }

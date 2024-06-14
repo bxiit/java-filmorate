@@ -1,102 +1,69 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.util.IdGenerator;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
-    private static final String SPACE = " ";
     private static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
+    private final UserService userService;
 
     static {
-        HTTP_HEADERS.setContentType(MediaType.APPLICATION_JSON);
+        HTTP_HEADERS.setContentType(APPLICATION_JSON);
     }
 
     @PostMapping()
     public ResponseEntity<User> addUser(@Valid @RequestBody User user) {
-        log.info("Создание нового пользователя");
-        validateUser(user);
-        user.setId(getMaxId());
-        if (Objects.isNull(user.getName())) {
-            user.setName(user.getLogin());
-        }
-        users.put(user.getId(), user);
-        log.info("Пользователь успешно создан с ID: {}", user.getId());
-
-        return new ResponseEntity<>(users.get(user.getId()), HTTP_HEADERS, HttpStatus.CREATED);
+        User addedUser = userService.addUser(user);
+        return new ResponseEntity<>(addedUser, HTTP_HEADERS, CREATED);
     }
 
-    @PutMapping()
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
-        log.debug("Обновление пользователя с id: {}", user.getId());
-
-        validateUser(user);
-
-        User userToUpdate = Optional.ofNullable(users.get(user.getId()))
-                .orElseThrow(() -> {
-                    log.error("Пользователь с id: {} не найден", user.getId());
-                    return new NotFoundException("Не существует пользователя с id: " + user.getId());
-                });
-
-        if (user.getName() != null) {
-            userToUpdate.setName(user.getName());
-        }
-        if (user.getLogin() != null) {
-            userToUpdate.setLogin(user.getLogin());
-        }
-        if (user.getEmail() != null) {
-            userToUpdate.setEmail(user.getEmail());
-        }
-        if (user.getBirthday() != null) {
-            userToUpdate.setBirthday(user.getBirthday());
-        }
-        users.put(userToUpdate.getId(), userToUpdate);
-        log.info("Пользователь успешно обновлен с ID: {}", user.getId());
-
-        return new ResponseEntity<>(users.get(user.getId()), HTTP_HEADERS, HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable("id") long userID) {
+        User user = userService.findUserById(userID)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        return new ResponseEntity<>(user, HTTP_HEADERS, OK);
     }
 
     @GetMapping()
     public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.of(Optional.of(new ArrayList<>(users.values())));
+        List<User> allUsers = userService.findAllUsers();
+        return new ResponseEntity<>(allUsers, HTTP_HEADERS, OK);
     }
 
-    private void validateUser(User user) {
-        log.warn("Валидация пользователя с email {}", user.getEmail());
-
-        String userLogin = user.getLogin();
-        log.warn("Валидация логина {}", user.getLogin());
-        if (userLogin.contains(SPACE) || user.getLogin().isEmpty()) {
-            throw new ValidationException("Логин не может содержать пробелы или быть пустым");
-        }
-
-        log.warn("Валидация даты рождения {}", user.getBirthday());
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Не валидная дата рождения");
-        }
+    @PutMapping()
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+        User updatedUser = userService.updateUser(user);
+        return new ResponseEntity<>(updatedUser, HTTP_HEADERS, OK);
     }
 
-    private Long getMaxId() {
-        return IdGenerator.getMaxIdOfUsers(users.keySet());
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUserById(@PathVariable("id") long userID) {
+        userService.deleteUserById(userID);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 }

@@ -1,0 +1,50 @@
+package ru.yandex.practicum.filmorate.storage.film;
+
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.util.IdGenerator;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Component
+public class InMemoryFilmStorage implements FilmStorage {
+    private final Map<Long, Film> films = new HashMap<>();
+
+    @Override
+    public Film addFilm(Film film) {
+        Long maxId = getMaxId();
+        film.setId(maxId);
+        films.put(film.getId(), film);
+        return films.get(film.getId());
+    }
+
+    @Override
+    public Optional<Film> findFilmById(long filmID) {
+        return Optional.ofNullable(films.get(filmID));
+    }
+
+    @Override
+    public List<Film> findAllFilms() {
+        return films.values().stream()
+                .toList();
+    }
+
+    @Override
+    public Film updateFilm(Film film) {
+        films.put(film.getId(), film);
+        return films.get(film.getId());
+    }
+
+    @Override
+    public boolean deleteFilmById(long filmID) {
+        Film removedFilm = films.remove(filmID);
+        return filmID == removedFilm.getId();
+    }
+
+    private Long getMaxId() {
+        return IdGenerator.getMaxIdOfFilms();
+    }
+}
