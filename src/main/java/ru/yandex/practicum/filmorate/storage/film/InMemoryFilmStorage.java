@@ -22,8 +22,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> findFilmById(long filmID) {
-        return Optional.ofNullable(films.get(filmID));
+    public Optional<Film> findFilmById(long filmId) {
+        return Optional.ofNullable(films.get(filmId));
     }
 
     @Override
@@ -39,9 +39,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean deleteFilmById(long filmID) {
-        Film removedFilm = films.remove(filmID);
-        return filmID == removedFilm.getId();
+    public boolean deleteFilmById(long filmId) {
+        Film removedFilm = films.remove(filmId);
+        return filmId == removedFilm.getId();
     }
 
     private Long getMaxId() {

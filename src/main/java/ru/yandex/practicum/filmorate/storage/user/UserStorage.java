@@ -8,11 +8,11 @@ import java.util.Optional;
 public interface UserStorage {
     User addUser(User user);
 
-    Optional<User> findUserById(long userID);
+    Optional<User> findUserById(long userId);
 
     List<User> findAllUsers();
 
     User updateUser(User user);
 
-    boolean deleteUserById(long userID);
+    boolean deleteUserById(long userId);
 }

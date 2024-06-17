@@ -11,9 +11,9 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.util.IdGenerator;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
@@ -25,19 +25,19 @@ public class UserService {
     private final UserStorage userStorage;
 
     public User addUser(User user) {
-        log.info("Создание нового пользователя");
         validateUser(user);
         user.setId(getMaxId());
+        user.setFriends(new HashSet<>());
         if (Objects.isNull(user.getName())) {
             user.setName(user.getLogin());
         }
         User addedUser = userStorage.addUser(user);
-        log.info("Пользователь успешно создан с ID: {}", addedUser.getId());
         return addedUser;
     }
 
-    public Optional<User> findUserById(long userID) {
-        return userStorage.findUserById(userID);
+    public User findUserById(long userId) {
+        return userStorage.findUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
     public List<User> findAllUsers() {
@@ -73,8 +73,8 @@ public class UserService {
         return updatedUser;
     }
 
-    public boolean deleteUserById(long userID) {
-        return userStorage.deleteUserById(userID);
+    public void deleteUserById(long userId) {
+        userStorage.deleteUserById(userId);
     }
 
     private void validateUser(User user) {
@@ -97,36 +97,32 @@ public class UserService {
     }
 
     // USER'S FRIENDS
-    public void addUsersFriend(long userID, long friendID) {
-        if (userID == friendID) {
+    public void addUsersFriend(long userId, long friendId) {
+        if (userId == friendId) {
             throw new ConflictException("вы не можете добавить себя же в друзья");
         }
 
-        User user = findUserById(userID)
-                .orElseThrow(() -> new NotFoundException("пользователь не найден"));
+        User user = findUserById(userId);
 
-        User userFriend = findUserById(friendID)
-                .orElseThrow(() -> new NotFoundException("друг не найден"));
+        User userFriend = findUserById(friendId);
 
         user.getFriends().add(userFriend.getId());
         userFriend.getFriends().add(user.getId());
     }
 
-    public void deleteUsersFriend(long userID, long friendID) {
-        if (userID == friendID) {
+    public void deleteUsersFriend(long userId, long friendId) {
+        if (userId == friendId) {
             throw new ConflictException("вы не можете добавить себя же в друзья");
         }
-        User user = findUserById(userID)
-                .orElseThrow(() -> new NotFoundException("пользователь не найден"));
-        User userFriend = findUserById(friendID)
-                .orElseThrow(() -> new NotFoundException("друг не найден"));
+        User user = findUserById(userId);
+        User userFriend = findUserById(friendId);
 
         user.getFriends().remove(userFriend.getId());
         userFriend.getFriends().remove(user.getId());
     }
 
-    public List<User> findUsersFriends(long userID) {
-        User user = userStorage.findUserById(userID)
+    public List<User> findUsersFriends(long userId) {
+        User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("пользователь не найден"));
 
         List<User> userFriends = user.getFriends().stream()
@@ -137,13 +133,13 @@ public class UserService {
         return userFriends;
     }
 
-    public List<User> findCommonUsers(long userID, long otherUserID) {
-        User user = userStorage.findUserById(userID)
+    public List<User> findCommonUsers(long userId, long otherUserId) {
+        User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("пользователь не найден"));
         List<User> usersCommonFriends = user.getFriends().stream()
                 .map(userStorage::findUserById)
                 .map(optionalUser -> optionalUser.orElseThrow(() -> new NotFoundException("пользователь не найден")))
-                .filter(userFriend -> userFriend.getFriends().contains(otherUserID))
+                .filter(userFriend -> userFriend.getFriends().contains(otherUserId))
                 .toList();
 
         return usersCommonFriends;

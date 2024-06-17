@@ -20,8 +20,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> findUserById(long userID) {
-        return Optional.ofNullable(users.get(userID));
+    public Optional<User> findUserById(long userId) {
+        return Optional.ofNullable(users.get(userId));
     }
 
     @Override
@@ -36,8 +36,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean deleteUserById(long userID) {
-        User removedUser = users.remove(userID);
-        return removedUser.getId() == userID;
+    public boolean deleteUserById(long userId) {
+        User removedUser = users.remove(userId);
+        return removedUser.getId() == userId;
     }
 }

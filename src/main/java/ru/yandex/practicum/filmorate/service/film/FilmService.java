@@ -13,8 +13,8 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -28,11 +28,12 @@ public class FilmService {
 
     public Film addFilm(Film film) {
         validateFilm(film);
+        film.setLikedUsersIDs(new HashSet<>());
         return filmStorage.addFilm(film);
     }
 
-    public Optional<Film> findFilmById(long filmID) {
-        return filmStorage.findFilmById(filmID);
+    public Film findFilmById(long filmId) {
+        return filmStorage.findFilmById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден"));
     }
 
     public List<Film> findAllFilms() {
@@ -60,26 +61,26 @@ public class FilmService {
         return filmStorage.updateFilm(oldFilm);
     }
 
-    public void deleteFilmById(long filmID) {
-        boolean deleted = filmStorage.deleteFilmById(filmID);
+    public void deleteFilmById(long filmId) {
+        boolean deleted = filmStorage.deleteFilmById(filmId);
         if (!deleted) {
             throw new NotFoundException("Фильм для удаления не найдено");
         }
     }
 
-    public void likeFilm(long filmID, long userID) {
-        Film film = filmStorage.findFilmById(filmID)
+    public void likeFilm(long filmId, long userId) {
+        Film film = filmStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("фильм не найден"));
-        User user = userStorage.findUserById(userID)
+        User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("пользователь не найден"));
 
         film.getLikedUsersIDs().add(user.getId());
     }
 
-    public void unlikeFilm(long filmID, long userID) {
-        Film film = filmStorage.findFilmById(filmID)
+    public void unlikeFilm(long filmId, long userId) {
+        Film film = filmStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("фильм не найден"));
-        User user = userStorage.findUserById(userID)
+        User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("пользователь не найден"));
 
         film.getLikedUsersIDs().remove(user.getId());
