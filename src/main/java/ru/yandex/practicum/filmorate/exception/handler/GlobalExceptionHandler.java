@@ -3,14 +3,16 @@ package ru.yandex.practicum.filmorate.exception.handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.AlreadyDoneException;
+import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.exception.response.ExceptionResponse;
 
+import java.net.URISyntaxException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -18,71 +20,43 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationException(ValidationException e) {
+    public ProblemDetail handleValidationException(ValidationException e) throws URISyntaxException {
         log.error(e.getMessage());
 
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                e.getMessage(),
-                HttpStatus.BAD_REQUEST
-        );
-
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException e) {
+    public ProblemDetail handleNotFoundException(NotFoundException e) {
         log.error(e.getMessage());
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                HttpStatus.NOT_FOUND.value(),
-                e.getMessage(),
-                HttpStatus.NOT_FOUND
-        );
-
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     // Валидация аннотацией в моделях
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleThrowable(MethodArgumentNotValidException e) {
+    public ProblemDetail handleThrowable(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
 
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                errorMessage,
-                HttpStatus.BAD_REQUEST
-        );
 
-        return ResponseEntity.badRequest().body(exceptionResponse);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleThrowable(Exception e) {
-        log.error(e.getMessage());
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Сервер подустал, попробуйте позже",
-                HttpStatus.INTERNAL_SERVER_ERROR
+    @ExceptionHandler(AlreadyDoneException.class)
+    public ProblemDetail handleUserAlreadyExist(final AlreadyDoneException e) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
         );
-
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(Error.class)
-    public ResponseEntity<ExceptionResponse> handleThrowable(Error e) {
-        log.error(e.getMessage());
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Ошибка, попробуйте позже",
-                HttpStatus.INTERNAL_SERVER_ERROR
+    @ExceptionHandler(ConflictException.class)
+    public ProblemDetail handleConflict(ConflictException e) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                e.getMessage()
         );
-
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -10,19 +10,27 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserControllerTest {
-    static UserController userController = new UserController();
+
+    static UserController userController;
     static ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeAll
     static void setUp() {
+        UserService userService = new UserService(new InMemoryUserStorage());
+        userController = new UserController(userService);
         objectMapper.registerModules(new JavaTimeModule());
     }
 
