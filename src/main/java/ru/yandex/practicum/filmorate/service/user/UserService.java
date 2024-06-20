@@ -31,8 +31,7 @@ public class UserService {
         if (Objects.isNull(user.getName())) {
             user.setName(user.getLogin());
         }
-        User addedUser = userStorage.addUser(user);
-        return addedUser;
+        return userStorage.addUser(user);
     }
 
     public User findUserById(long userId) {

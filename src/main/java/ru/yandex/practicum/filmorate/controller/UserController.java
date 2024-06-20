@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,40 +20,34 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private static final HttpHeaders HTTP_HEADERS = new HttpHeaders();
     private final UserService userService;
-
-    static {
-        HTTP_HEADERS.setContentType(APPLICATION_JSON);
-    }
 
     @PostMapping()
     public ResponseEntity<User> addUser(@Valid @RequestBody User user) {
         log.info("Создание нового пользователя");
         User addedUser = userService.addUser(user);
         log.info("Пользователь успешно создан с ID: {}", addedUser.getId());
-        return new ResponseEntity<>(addedUser, HTTP_HEADERS, CREATED);
+        return new ResponseEntity<>(addedUser, CREATED);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") long userId) {
         User user = userService.findUserById(userId);
         log.info("Получение пользователя с ID = {}", userId);
-        return new ResponseEntity<>(user, HTTP_HEADERS, OK);
+        return new ResponseEntity<>(user, OK);
     }
 
     @GetMapping()
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> allUsers = userService.findAllUsers();
         log.info("Получение всех пользователей");
-        return new ResponseEntity<>(allUsers, HTTP_HEADERS, OK);
+        return new ResponseEntity<>(allUsers, OK);
     }
 
     @PutMapping()
@@ -62,7 +55,7 @@ public class UserController {
         log.info("Обновление пользователя с ID = {}", user.getId());
         User updatedUser = userService.updateUser(user);
         log.info("Пользователь с ID = {} успешно обновлен", user.getId());
-        return new ResponseEntity<>(updatedUser, HTTP_HEADERS, OK);
+        return new ResponseEntity<>(updatedUser, OK);
     }
 
     @DeleteMapping("/{id}")

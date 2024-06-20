@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 @Slf4j
@@ -28,7 +27,6 @@ public class FilmService {
 
     public Film addFilm(Film film) {
         validateFilm(film);
-        film.setLikedUsersIDs(new HashSet<>());
         return filmStorage.addFilm(film);
     }
 

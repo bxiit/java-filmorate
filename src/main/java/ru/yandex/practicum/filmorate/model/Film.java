@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.util.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -34,5 +35,5 @@ public class Film {
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
 
-    private Set<Long> likedUsersIDs;
+    private Set<Long> likedUsersIDs = new HashSet<>();
 }
