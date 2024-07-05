@@ -1,63 +1,70 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class FilmControllerTest {
+@SpringBootTest
+@AutoConfigureTestDatabase
+@ActiveProfiles("test")
+class FilmControllerTest extends BaseControllerTests<FilmController> {
 
-    static FilmController filmController;
-
-    @BeforeAll
-    static void setUp() {
-        FilmService filmService = new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage());
-        filmController = new FilmController(filmService);
+    @Autowired
+    public FilmControllerTest(FilmController controller) {
+        super(controller);
     }
 
     @Test
     void testFilmModel_shouldThrowValidationException_invalidNameAndDescription() {
-        Film film = new Film(null, "",
-                "film 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
-                "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
-                " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
-                "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
-                " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
-                "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
-                " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
-                "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
-                " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
-                "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
-                " 1 name descriptionfilm 1 name descriptionfilm 1 name description",
-                LocalDate.now(), Duration.ofMinutes(90), new HashSet<>());
+        NewFilmRequest request = new NewFilmRequest();
+        request.setName("");
+        request.setDescription("film 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
+                               "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
+                               " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
+                               "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
+                               " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
+                               "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
+                               " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
+                               "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
+                               " 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
+                               "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
+                               " 1 name descriptionfilm 1 name descriptionfilm 1 name description");
+        request.setDuration(Duration.ofMinutes(90));
+        request.setReleaseDate(LocalDate.now());
 
-        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertThrows(ValidationException.class, () -> controller.addFilm(request));
     }
 
     @Test
     void testFilmModel_shouldNotThrowValidationException_releaseDateIsExactlyTheEarliestDate() {
-        Film film = new Film(null, "Earliest film", "Description of Earliest film",
-                LocalDate.of(1895, Month.DECEMBER, 28), Duration.ofMinutes(100), new HashSet<>());
+        NewFilmRequest request = new NewFilmRequest();
+        request.setName("Earliest film");
+        request.setDescription("Description of Earliest film");
+        request.setDuration(Duration.ofMinutes(100));
+        request.setReleaseDate(LocalDate.of(1895, Month.DECEMBER, 28));
 
-        assertDoesNotThrow(() -> filmController.addFilm(film));
+        assertDoesNotThrow(() -> controller.addFilm(request));
     }
 
     @Test
     void testFilmModel_shouldThrowValidationException_releaseDateIsInvalid() {
-        Film film = new Film(null, "Earliest film", "Description of Earliest film",
-                LocalDate.of(1895, Month.DECEMBER, 27), Duration.ofMinutes(100), new HashSet<>());
+        NewFilmRequest request = new NewFilmRequest();
+        request.setName("Earliest film");
+        request.setDescription("Description of Earliest film");
+        request.setDuration(Duration.ofMinutes(100));
+        request.setReleaseDate(LocalDate.of(1895, Month.DECEMBER, 27));
 
-        assertThrows(ValidationException.class, () -> filmController.addFilm(film));
+        assertThrows(ValidationException.class, () -> controller.addFilm(request));
     }
 }

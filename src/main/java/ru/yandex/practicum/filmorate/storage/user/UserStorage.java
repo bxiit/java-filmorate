@@ -15,4 +15,12 @@ public interface UserStorage {
     User updateUser(User user);
 
     boolean deleteUserById(long userId);
+
+    Long addFriend(long user1Id, long user2Id, String reqStatus);
+
+    List<User> findFriendsById(long userId);
+
+    List<User> findCommonFriends(long userId, long friendId);
+
+    boolean deleteFriend(long user1Id, long user2Id, String reqStatus);
 }

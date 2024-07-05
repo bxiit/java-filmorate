@@ -1,9 +1,8 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto.film;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
@@ -12,19 +11,13 @@ import ru.yandex.practicum.filmorate.util.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
- * Film.
- */
-@Data
-@AllArgsConstructor
-public class Film {
+@Getter
+public class UpdateFilmRequest {
 
-    public Film() {
-        this.likedUsersIDs = new HashSet<>();
+    public UpdateFilmRequest() {
         this.genres = new TreeSet<>();
     }
 
@@ -41,9 +34,31 @@ public class Film {
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
 
-    private Set<Long> likedUsersIDs;
-
     private MpaDto mpa;
 
     private Set<GenreDto> genres;
+
+    public boolean hasName() {
+        return this.getName() != null;
+    }
+
+    public boolean hasDescription() {
+        return this.getDescription() != null;
+    }
+
+    public boolean hasReleaseDate() {
+        return this.getReleaseDate() != null;
+    }
+
+    public boolean hasDuration() {
+        return this.getDuration() != null;
+    }
+
+    public boolean hasMpa() {
+        return this.getMpa() != null;
+    }
+
+    public boolean hasGenres() {
+        return this.getGenres() != null;
+    }
 }

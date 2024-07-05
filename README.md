@@ -14,26 +14,39 @@ GROUP BY f.name;
 
 Имена друзей пользователя с ID = 17.
 ```postgresql
-SELECT u.name
-FROM user u
-JOIN friends f ON (u.user_id = f.user1_id) OR (u.user_id = f.user2_id)
-WHERE (u.user_id = f.user1_id AND f.user1_id = 17 AND f.confirmed = true)
-OR (u.user_id = f.user2_id AND f.user2_id = 17 AND f.confirmed = true)
+WITH uid AS (
+    SELECT 17 AS id
+)
+
+SELECT CASE
+           WHEN user1_id = (SELECT * FROM uid) THEN user2_id
+           ELSE user1_id
+           END AS friend_id
+FROM friends
+WHERE (user1_id = (SELECT * FROM uid) OR user2_id = (SELECT * FROM uid)) AND status = 'FRIENDS';
 ```
 
 Общие друзья пользователей с ID = 44 и ID = 17.
 ```postgresql
-SELECT *
-FROM user u
-         JOIN friends f ON (u.user_id = f.user1_id) OR (u.user_id = f.user2_id)
-WHERE (u.user_id = f.user1_id AND f.user1_id = 44 AND f.confirmed = true)
-   OR (u.user_id = f.user2_id AND f.user2_id = 44 AND f.confirmed = true)
-UNION
-SELECT *
-FROM user u
-         JOIN friends f ON (u.user_id = f.user1_id) OR (u.user_id = f.user2_id)
-WHERE (u.user_id = f.user1_id AND f.user1_id = 17 AND f.confirmed = true)
-   OR (u.user_id = f.user2_id AND f.user2_id = 17 AND f.confirmed = true)
+WITH u1id AS (
+    SELECT 17 AS u1
+),
+     u2id AS (
+         SELECT 44 AS u2
+     )
+SELECT CASE
+           WHEN user1_id = (SELECT * FROM u1id) THEN user2_id
+           ELSE user1_id
+           END AS friend_id
+FROM friends
+WHERE (user1_id = (SELECT * FROM u1id) OR user2_id = (SELECT * FROM u1id)) AND status = 'FRIENDS'
+INTERSECT
+SELECT CASE
+           WHEN user1_id = (SELECT * FROM u2id) THEN user2_id
+           ELSE user1_id
+           END AS friend_id
+FROM friends
+WHERE (user1_id = (SELECT * FROM u2id) OR user2_id = (SELECT * FROM u2id)) AND status = 'FRIENDS';
 ```
 > [!IMPORTANT]
 > <br> 
