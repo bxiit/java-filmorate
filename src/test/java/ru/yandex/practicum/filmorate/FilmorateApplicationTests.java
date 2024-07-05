@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.assertj.core.data.Index;
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,16 @@ public class FilmorateApplicationTests {
 
         assertThatThrownBy(() -> userStorage.addUser(sameUser))
                 .isInstanceOf(DuplicateKeyException.class)
-                .hasMessageContaining("Нарушение уникального индекса");
+                .satisfies(exception -> {
+                    DuplicateKeyException duplicateKeyException = (DuplicateKeyException) exception;
+
+                    if (duplicateKeyException.getRootCause() instanceof JdbcSQLIntegrityConstraintViolationException jdbcException) {
+                        int duplicateErrorCode = jdbcException.getErrorCode();
+
+                        assertThat(duplicateErrorCode)
+                                .isEqualTo(23505);
+                    }
+                });
     }
 
     @Test
@@ -94,9 +104,7 @@ public class FilmorateApplicationTests {
 
         assertThat(userOptional)
                 .isPresent()
-                .hasValueSatisfying(u -> {
-                    assertThat(u).hasFieldOrPropertyWithValue("id", 1L);
-                });
+                .hasValueSatisfying(u -> assertThat(u).hasFieldOrPropertyWithValue("id", 1L));
     }
 
     @Test
@@ -166,9 +174,7 @@ public class FilmorateApplicationTests {
         assertThat(userOptional)
                 .isPresent()
                 .hasValueSatisfying(
-                        user -> {
-                            assertThat(user).isEqualTo(userToAddThenDeleteThenFind);
-                        }
+                        user -> assertThat(user).isEqualTo(userToAddThenDeleteThenFind)
                 );
 
         boolean deleted = userStorage.deleteUserById(userId);
