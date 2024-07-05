@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
@@ -61,8 +62,8 @@ class UserControllerTest extends BaseControllerTests<UserController> {
         assertTrue(validatedUserSet.stream()
                 .anyMatch(results -> results.getMessage().equals("Пустая дата рождения")));
 
-        // при валидации null.isAfter() бросить NPE
-        assertThrows(NullPointerException.class, () -> controller.addUser(request));
+        // при сохранении в таблицу бросится DataIntegrityViolationException (в таблице есть констрейнт NOT NULL)
+        assertThrows(DataIntegrityViolationException.class, () -> controller.addUser(request));
     }
 
     @Test

@@ -1,19 +1,23 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -43,7 +47,26 @@ class FilmControllerTest extends BaseControllerTests<FilmController> {
         request.setDuration(Duration.ofMinutes(90));
         request.setReleaseDate(LocalDate.now());
 
-        assertThrows(ValidationException.class, () -> controller.addFilm(request));
+        // Название фильма не может быть пустым
+        // Описание фильма не может быть длиннее 200 символов
+
+        Validator validator;
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.getValidator();
+        }
+
+        assertThat(validator)
+                .isNotNull();
+
+        Set<ConstraintViolation<NewFilmRequest>> validationResults = validator.validate(request);
+
+        assertThat(validationResults)
+                .hasSize(2)
+                .extracting(ConstraintViolation::getMessage)
+                .containsExactlyInAnyOrder(
+                        "Название фильма не может быть пустым",
+                        "Описание фильма не может быть длиннее 200 символов"
+                );
     }
 
     @Test
@@ -65,6 +88,18 @@ class FilmControllerTest extends BaseControllerTests<FilmController> {
         request.setDuration(Duration.ofMinutes(100));
         request.setReleaseDate(LocalDate.of(1895, Month.DECEMBER, 27));
 
-        assertThrows(ValidationException.class, () -> controller.addFilm(request));
+        Validator validator;
+        try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
+            validator = validatorFactory.getValidator();
+        }
+
+        assertThat(validator)
+                .isNotNull();
+
+        Set<ConstraintViolation<NewFilmRequest>> validationResults = validator.validate(request);
+        assertThat(validationResults)
+                .hasSize(1)
+                .anySatisfy(violation -> assertThat(violation.getMessage())
+                        .isEqualTo("Дата релиза фильма слишком старая"));
     }
 }
