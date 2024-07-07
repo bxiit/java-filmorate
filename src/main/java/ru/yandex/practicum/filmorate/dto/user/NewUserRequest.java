@@ -3,17 +3,17 @@ package ru.yandex.practicum.filmorate.dto.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.PastOrPresent;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.util.validator.annotations.NoSpace;
 
 import java.time.LocalDate;
 
-@Getter
-@Setter
+@Data
 public class NewUserRequest {
+
+    private String name;
 
     @NotNull(message = "Пустой адрес электронной почты")
     @Email(message = "Неверный формат электронной почты")
@@ -23,10 +23,9 @@ public class NewUserRequest {
     @NoSpace(message = "Логин содержит пробел")
     private String login;
 
-    private String name;
 
     @NotNull(message = "Пустая дата рождения")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @Past(message = "Некорректная дата дня рождения")
+    @PastOrPresent(message = "Некорректная дата дня рождения")
     private LocalDate birthday;
 }

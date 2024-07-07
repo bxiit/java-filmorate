@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate.dto.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Past;
-import lombok.Getter;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@Getter
+@Data
 public class UpdateUserRequest {
     private long id;
 

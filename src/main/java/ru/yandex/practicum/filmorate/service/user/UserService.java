@@ -8,16 +8,11 @@ import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
-
-import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Slf4j
 @Service
@@ -30,29 +25,29 @@ public class UserService {
     }
 
     public UserDto addUser(NewUserRequest request) {
-        User user = UserMapper.mapToUser(request);
-        user = userStorage.addUser(user);
-        return UserMapper.mapToUserDto(user);
+        User userTest = UserMapper.MAPPER.mapNewUserToUser(request);
+        userTest = userStorage.addUser(userTest);
+        return UserMapper.MAPPER.mapToUserDto(userTest);
     }
 
     public UserDto findUserById(long userId) {
         return userStorage.findUserById(userId)
-                .map(UserMapper::mapToUserDto)
+                .map(UserMapper.MAPPER::mapToUserDto)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
     public List<UserDto> findAllUsers() {
         return userStorage.findAllUsers()
-                .stream().map(UserMapper::mapToUserDto)
+                .stream().map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
     }
 
     public UserDto updateUser(long userId, UpdateUserRequest request) {
         User updatedUser = userStorage.findUserById(userId)
-                .map(user -> UserMapper.updateUserFields(user, request))
+                .map(user -> UserMapper.MAPPER.updateUserFields(user, request))
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         updatedUser = userStorage.updateUser(updatedUser);
-        return UserMapper.mapToUserDto(updatedUser);
+        return UserMapper.MAPPER.mapToUserDto(updatedUser);
     }
 
     public void deleteUserById(long userId) {
@@ -93,13 +88,13 @@ public class UserService {
             throw new NotFoundException("Пользователь не найден");
         }
         return userStorage.findFriendsById(userId).stream()
-                .map(UserMapper::mapToUserDto)
+                .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
     }
 
     public List<UserDto> findCommonUsers(long userId, long otherUserId) {
         return userStorage.findCommonFriends(userId, otherUserId).stream()
-                .map(UserMapper::mapToUserDto)
+                .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
     }
 
@@ -116,38 +111,6 @@ public class UserService {
     private void doesUsersExist(long userId) {
         if (userStorage.findUserById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
-        }
-    }
-
-    private void validateNewUser(NewUserRequest request) {
-        log.warn("Валидация пользователя с email {}", request.getEmail());
-
-        if (Objects.isNull(request.getName())) {
-            request.setName(request.getLogin());
-        }
-        String userLogin = request.getLogin();
-        log.warn("Валидация логина {}", request.getLogin());
-        if (userLogin.contains(SPACE) || userLogin.isEmpty()) {
-            throw new ValidationException("Логин не может содержать пробелы или быть пустым");
-        }
-
-        log.warn("Валидация даты рождения {}", request.getBirthday());
-        if (request.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Не валидная дата рождения");
-        }
-    }
-
-    private void validateUpdatedUser(UpdateUserRequest request) {
-        log.warn("Валидация пользователя с email {}", request.getEmail());
-
-        log.warn("Валидация логина {}", request.getLogin());
-        if (request.getLogin().contains(SPACE) || request.getLogin().isEmpty()) {
-            throw new ValidationException("Логин не может содержать пробелы или быть пустым");
-        }
-
-        log.warn("Валидация даты рождения {}", request.getBirthday());
-        if (request.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Не валидная дата рождения");
         }
     }
 }

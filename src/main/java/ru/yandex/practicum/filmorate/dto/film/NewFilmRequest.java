@@ -7,8 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
@@ -21,8 +20,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 public class NewFilmRequest {
 
     @NotEmpty(message = "Название фильма не может быть пустым")

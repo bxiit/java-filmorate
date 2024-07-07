@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -84,16 +85,21 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public Film addFilm(Film film) {
-        long filmId = insert(
-                INSERT_QUERY,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate().format(DateTimeFormatter.ISO_DATE),
-                film.getDuration().toSeconds(),
-                film.getMpa() == null ? null : film.getMpa().getId()
-        );
-        film.setId(filmId);
+        long filmId = 0;
+        try {
+            filmId = insert(
+                    INSERT_QUERY,
+                    film.getName(),
+                    film.getDescription(),
+                    film.getReleaseDate().format(DateTimeFormatter.ISO_DATE),
+                    film.getDuration().toSeconds(),
+                    film.getMpa() == null ? null : film.getMpa().getId()
+            );
+        } catch (DataIntegrityViolationException e) {
+            handleAlreadyExistence("Фильм уже существует", e);
+        }
 
+        film.setId(filmId);
         for (GenreDto genreDto : film.getGenres()) {
             insertFilmGenre(filmId, genreDto.getId());
         }

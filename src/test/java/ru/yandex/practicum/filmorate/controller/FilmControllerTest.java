@@ -6,9 +6,6 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 
 import java.time.Duration;
@@ -19,10 +16,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@SpringBootTest
-@AutoConfigureTestDatabase
-@ActiveProfiles("test")
-class FilmControllerTest extends BaseControllerTests<FilmController> {
+class FilmControllerTest extends BaseControllerTest<FilmController> {
 
     @Autowired
     public FilmControllerTest(FilmController controller) {
@@ -31,6 +25,8 @@ class FilmControllerTest extends BaseControllerTests<FilmController> {
 
     @Test
     void testFilmModel_shouldThrowValidationException_invalidNameAndDescription() {
+        // Название фильма не может быть пустым
+        // Описание фильма не может быть длиннее 200 символов
         NewFilmRequest request = new NewFilmRequest();
         request.setName("");
         request.setDescription("film 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
@@ -46,9 +42,6 @@ class FilmControllerTest extends BaseControllerTests<FilmController> {
                                " 1 name descriptionfilm 1 name descriptionfilm 1 name description");
         request.setDuration(Duration.ofMinutes(90));
         request.setReleaseDate(LocalDate.now());
-
-        // Название фильма не может быть пустым
-        // Описание фильма не может быть длиннее 200 символов
 
         Validator validator;
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {

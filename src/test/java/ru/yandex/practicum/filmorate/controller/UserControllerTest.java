@@ -9,10 +9,6 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.context.ActiveProfiles;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
 
@@ -22,13 +18,9 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
-@AutoConfigureTestDatabase
-@ActiveProfiles("test")
-class UserControllerTest extends BaseControllerTests<UserController> {
+class UserControllerTest extends BaseControllerTest<UserController> {
 
     static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -43,7 +35,7 @@ class UserControllerTest extends BaseControllerTests<UserController> {
     }
 
     @Test
-    void testUserModel_shouldThrowNullPointerException_releaseDateIsNull() {
+    void testUserModel_shouldValidateAndHaveMessageAboutEmptyBirthday_releaseDateIsNull() {
         NewUserRequest request = new NewUserRequest();
         request.setName("Bexeiit");
         request.setBirthday(null);
@@ -61,9 +53,6 @@ class UserControllerTest extends BaseControllerTests<UserController> {
         assertEquals(1, validatedUserSet.size());
         assertTrue(validatedUserSet.stream()
                 .anyMatch(results -> results.getMessage().equals("Пустая дата рождения")));
-
-        // при сохранении в таблицу бросится DataIntegrityViolationException (в таблице есть констрейнт NOT NULL)
-        assertThrows(DataIntegrityViolationException.class, () -> controller.addUser(request));
     }
 
     @Test

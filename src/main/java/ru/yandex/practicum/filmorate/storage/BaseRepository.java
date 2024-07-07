@@ -2,11 +2,14 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 
 import java.sql.PreparedStatement;
@@ -80,5 +83,16 @@ public class BaseRepository<T> {
     protected boolean delete(String query, Object... params) {
         int deletedRows = jdbc.update(query, params);
         return deletedRows > 0;
+    }
+
+    protected void handleAlreadyExistence(String message, DataIntegrityViolationException e) {
+        if (e.getCause() instanceof JdbcSQLIntegrityConstraintViolationException) {
+            JdbcSQLIntegrityConstraintViolationException constraintException =
+                    (JdbcSQLIntegrityConstraintViolationException) e.getCause();
+            if (constraintException.getErrorCode() == 23505) {
+                throw new ConflictException(message);
+            }
+        }
+        e.printStackTrace();
     }
 }

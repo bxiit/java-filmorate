@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.dto.film;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Getter;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.TreeSet;
 
-@Getter
+@Data
 public class UpdateFilmRequest {
 
     public UpdateFilmRequest() {

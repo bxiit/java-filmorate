@@ -16,6 +16,8 @@ import ru.yandex.practicum.filmorate.storage.BaseRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Qualifier("UserDBStorage")
@@ -81,20 +83,32 @@ public class UserDBStorage extends BaseRepository<User> implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        long id = insert(
-                INSERT_QUERY,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday()
-        );
+        long id = 0;
+        try {
+            id = insert(
+                    INSERT_QUERY,
+                    user.getEmail(),
+                    user.getLogin(),
+                    user.getName(),
+                    user.getBirthday()
+            );
+        } catch (DataIntegrityViolationException e) {
+            handleAlreadyExistence("Пользователь уже существует", e);
+        }
         user.setId(id);
         return user;
     }
 
     @Override
     public Optional<User> findUserById(long userId) {
-        return findOne(FIND_BY_ID_QUERY, userId);
+        Optional<User> user = findOne(FIND_BY_ID_QUERY, userId);
+        user.ifPresent(u -> {
+            Set<Long> friendsIds = findFriendsById(userId).stream()
+                    .map(User::getId)
+                    .collect(Collectors.toSet());
+            u.setFriends(friendsIds);
+        });
+        return user;
     }
 
     @Override
