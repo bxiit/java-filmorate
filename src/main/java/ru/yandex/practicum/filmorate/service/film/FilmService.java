@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.cache.RedisRepositoryImpl;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
@@ -30,6 +31,8 @@ public class FilmService {
     @Qualifier("FilmDBStorage")
     private final FilmStorage filmStorage;
 
+    private final RedisRepositoryImpl redisRepository;
+
     private final MpaDBStorage mpaStorage;
 
     private final GenreDBStorage genreStorage;
@@ -46,11 +49,17 @@ public class FilmService {
     }
 
     public FilmDto findFilmById(long filmId) {
+        Film cachedFilm = redisRepository.find(filmId);
+        if (cachedFilm != null) {
+            return FilmMapper.MAPPER.mapToFilmDto(cachedFilm);
+        }
+
         FilmDto filmDto = filmStorage.findFilmById(filmId)
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         setGenreName(filmDto);
         setMpaName(filmDto);
+        redisRepository.add(FilmMapper.MAPPER.mapToFilmModel(filmDto));
         return filmDto;
     }
 

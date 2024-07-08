@@ -34,6 +34,9 @@ public interface FilmMapper {
     @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
     FilmDto mapToFilmDto(Film film);
 
+    @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
+    Film mapToFilmModel(FilmDto filmDto);
+
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "request.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
