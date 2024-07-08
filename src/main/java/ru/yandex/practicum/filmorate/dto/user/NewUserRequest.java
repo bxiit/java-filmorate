@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.yandex.practicum.filmorate.util.validator.annotations.NoSpace;
+import ru.yandex.practicum.filmorate.util.annotations.NoSpace;
 
 import java.time.LocalDate;
 

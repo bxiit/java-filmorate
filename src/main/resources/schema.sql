@@ -7,7 +7,7 @@ drop table if exists MPA;
 drop table if exists USERS;
 
 CREATE TABLE IF NOT EXISTS users(
-                                   user_id BIGINT PRIMARY KEY AUTO_INCREMENT ,
+                                   user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
                                    email TEXT UNIQUE NOT NULL ,
                                    login TEXT UNIQUE NOT NULL ,
                                    name TEXT ,
@@ -18,9 +18,11 @@ CREATE TYPE IF NOT EXISTS friends_status AS ENUM('REQ_USER1', 'REQ_USER2', 'FRIE
 
 CREATE TABLE IF NOT EXISTS friends(
     friends_id BIGINT AUTO_INCREMENT PRIMARY KEY ,
-    user1_id BIGINT REFERENCES users(user_id),
-    user2_id BIGINT REFERENCES users(user_id),
+    user1_id BIGINT,
+    user2_id BIGINT,
     status friends_status,
+    CONSTRAINT user1_id_fk FOREIGN KEY (user1_id) REFERENCES users(user_id) ON DELETE CASCADE ,
+    CONSTRAINT user2_id_fk FOREIGN KEY (user2_id) REFERENCES users(user_id) ON DELETE CASCADE ,
     CONSTRAINT check_friend CHECK (user1_id < user2_id),
     CONSTRAINT unique_friends UNIQUE(user1_id, user2_id, status)
 );

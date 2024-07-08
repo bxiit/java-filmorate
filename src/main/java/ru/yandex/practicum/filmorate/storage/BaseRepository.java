@@ -24,9 +24,7 @@ public class BaseRepository<T> {
     protected final ResultSetExtractor<List<T>> extractor;
 
     protected long insert(String query, Object... params) {
-        log.debug("Сохранение по запросу:");
-        log.debug(query);
-        log.debug("С параметрами {}", params);
+        log.debug("Сохранение по запросу: {} с параметрами {}", query, params);
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(con -> {
@@ -76,6 +74,7 @@ public class BaseRepository<T> {
     }
 
     protected boolean update(String query, Object... params) {
+        log.debug("Обновление записи по запросу: {} с параметрами {}", query, params);
         int updatedRows = jdbc.update(query, params);
         return updatedRows > 0;
     }
@@ -93,6 +92,5 @@ public class BaseRepository<T> {
                 throw new ConflictException(message);
             }
         }
-        e.printStackTrace();
     }
 }

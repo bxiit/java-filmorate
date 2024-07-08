@@ -3,11 +3,8 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -34,7 +31,7 @@ public class FilmService {
 
     private final GenreDBStorage genreStorage;
 
-    public FilmDto addFilm(NewFilmRequest request) {
+    public FilmDto addFilm(FilmDto request) {
         checkMpaExistence(request.getMpa());
         checkGenreExistence(request.getGenres());
         Film film = FilmMapper.MAPPER.mapNewFilmToFilm(request);
@@ -62,7 +59,7 @@ public class FilmService {
                 .toList();
     }
 
-    public FilmDto updateFilm(UpdateFilmRequest request) {
+    public FilmDto updateFilm(FilmDto request) {
         Film film = filmStorage.findFilmById(request.getId())
                 .map(f -> FilmMapper.MAPPER.updateFilmFields(f, request))
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
@@ -98,14 +95,10 @@ public class FilmService {
     }
 
     private void likeFilmAction(long filmId, long userId, boolean isLike) {
-        try {
-            if (isLike) {
-                filmStorage.likeFilm(filmId, userId);
-            } else {
-                filmStorage.unlikeFilm(filmId, userId);
-            }
-        } catch (DataIntegrityViolationException e) {
-            e.printStackTrace();
+        if (isLike) {
+            filmStorage.likeFilm(filmId, userId);
+        } else {
+            filmStorage.unlikeFilm(filmId, userId);
         }
     }
 

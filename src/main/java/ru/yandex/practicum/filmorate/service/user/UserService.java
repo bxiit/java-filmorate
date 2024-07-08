@@ -11,17 +11,22 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.user.friend.FriendStorage;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
 
-    public UserService(@Qualifier("UserDBStorage") UserStorage userStorage) {
+    public UserService(@Qualifier("UserDBStorage") UserStorage userStorage, @Qualifier("friendDBStorage") FriendStorage friendStorage) {
         this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
     }
 
     public UserDto addUser(NewUserRequest request) {
@@ -31,14 +36,24 @@ public class UserService {
     }
 
     public UserDto findUserById(long userId) {
-        return userStorage.findUserById(userId)
-                .map(UserMapper.MAPPER::mapToUserDto)
+        User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        setFriendsByUser(userId, user);
+        return UserMapper.MAPPER.mapToUserDto(user);
+    }
+
+    private User setFriendsByUser(long userId, User user) {
+        Set<Long> friendsIds = friendStorage.findFriendsById(userId).stream()
+                .map(User::getId)
+                .collect(Collectors.toSet());
+        user.setFriends(friendsIds);
+        return user;
     }
 
     public List<UserDto> findAllUsers() {
-        return userStorage.findAllUsers()
-                .stream().map(UserMapper.MAPPER::mapToUserDto)
+        return userStorage.findAllUsers().stream()
+                .map(user -> setFriendsByUser(user.getId(), user))
+                .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
     }
 
@@ -63,9 +78,9 @@ public class UserService {
         doesUsersExist(friendId);
         String reqStatus = setStatus(userId, friendId);
         if (userId < friendId) {
-            userStorage.addFriend(userId, friendId, reqStatus);
+            friendStorage.addFriend(userId, friendId, reqStatus);
         } else {
-            userStorage.addFriend(friendId, userId, reqStatus);
+            friendStorage.addFriend(friendId, userId, reqStatus);
         }
     }
 
@@ -77,9 +92,9 @@ public class UserService {
         doesUsersExist(friendId);
         String reqStatus = setStatus(userId, friendId);
         if (userId < friendId) {
-            userStorage.deleteFriend(userId, friendId, reqStatus);
+            friendStorage.deleteFriend(userId, friendId, reqStatus);
         } else {
-            userStorage.deleteFriend(friendId, userId, reqStatus);
+            friendStorage.deleteFriend(friendId, userId, reqStatus);
         }
     }
 
@@ -87,13 +102,13 @@ public class UserService {
         if (userStorage.findUserById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
-        return userStorage.findFriendsById(userId).stream()
+        return friendStorage.findFriendsById(userId).stream()
                 .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
     }
 
     public List<UserDto> findCommonUsers(long userId, long otherUserId) {
-        return userStorage.findCommonFriends(userId, otherUserId).stream()
+        return friendStorage.findCommonFriends(userId, otherUserId).stream()
                 .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
     }

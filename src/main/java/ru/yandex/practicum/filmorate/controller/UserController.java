@@ -70,6 +70,12 @@ public class UserController {
         log.info("Удаление пользователя с ID = {}", userId);
     }
 
+    @GetMapping("/{id}/friends")
+    @ResponseStatus(OK)
+    public List<UserDto> getUsersFriends(@PathVariable("id") long userId) {
+        return userService.findUsersFriends(userId);
+    }
+
     @PutMapping("/{id}/friends/{friendId}")
     @ResponseStatus(OK)
     public void addUserFriends(
@@ -87,12 +93,6 @@ public class UserController {
             @PathVariable("friendId") long friendId
     ) {
         userService.deleteUsersFriend(userId, friendId);
-    }
-
-    @GetMapping("/{id}/friends")
-    @ResponseStatus(OK)
-    public List<UserDto> getUsersFriends(@PathVariable("id") long userId) {
-        return userService.findUsersFriends(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")

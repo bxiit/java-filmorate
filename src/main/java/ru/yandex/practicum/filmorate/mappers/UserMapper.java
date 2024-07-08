@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.User;
 @Mapper(builder = @Builder(disableBuilder = true), componentModel = "spring")
 public interface UserMapper {
 
+    @Mapping(target = "friends", expression = "java(user.getFriends())")
     UserDto mapToUserDto(User user);
 
     @Mapping(target = "friends", expression = "java(new java.util.HashSet<>())")

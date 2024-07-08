@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.util.List;
@@ -34,7 +31,7 @@ public class FilmController {
 
     @PostMapping()
     @ResponseStatus(CREATED)
-    public FilmDto addFilm(@Valid @RequestBody NewFilmRequest film) {
+    public FilmDto addFilm(@Valid @RequestBody FilmDto film) {
         return filmService.addFilm(film);
     }
 
@@ -52,15 +49,14 @@ public class FilmController {
 
     @PutMapping()
     @ResponseStatus(OK)
-    public FilmDto updateFilm(@Valid @RequestBody UpdateFilmRequest request) {
+    public FilmDto updateFilm(@Valid @RequestBody FilmDto request) {
         return filmService.updateFilm(request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public ResponseEntity<String> deleteFilmById(@PathVariable("id") long filmId) {
+    public void deleteFilmById(@PathVariable("id") long filmId) {
         filmService.deleteFilmById(filmId);
-        return new ResponseEntity<>(NO_CONTENT);
     }
 
     @GetMapping("/popular")
@@ -73,15 +69,13 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(OK)
-    public ResponseEntity<Void> likeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
+    public void likeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
         filmService.likeFilm(filmId, userId);
-        return new ResponseEntity<>(OK);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(OK)
-    public ResponseEntity<Void> unlikeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
+    public void unlikeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
         filmService.unlikeFilm(filmId, userId);
-        return new ResponseEntity<>(OK);
     }
 }

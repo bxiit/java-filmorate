@@ -25,6 +25,7 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.RowMapperConfig;
 import ru.yandex.practicum.filmorate.storage.mappers.extractors.ResultSetExtractorConfig;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
+import ru.yandex.practicum.filmorate.storage.user.FriendDBStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 
 import java.sql.SQLException;
@@ -36,7 +37,7 @@ import java.util.Objects;
         MpaController.class, GenreController.class,
         UserService.class, FilmService.class,
         MpaService.class, GenreService.class,
-        UserDBStorage.class, FilmDBStorage.class,
+        UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class,
         MpaDBStorage.class, GenreDBStorage.class,
         ResultSetExtractorConfig.class,
         RowMapperConfig.class

@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.util.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ru.yandex.practicum.filmorate.util.validator.annotations.NotBefore;
+import ru.yandex.practicum.filmorate.util.annotations.NotBefore;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

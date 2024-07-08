@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exception.AlreadyDoneException;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.TemporarilyNotAvailableException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import java.net.URISyntaxException;
@@ -56,6 +57,14 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleConflict(ConflictException e) {
         return ProblemDetail.forStatusAndDetail(
                 HttpStatus.CONFLICT,
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler(TemporarilyNotAvailableException.class)
+    public ProblemDetail handleTemporarilyNotAvailableException(TemporarilyNotAvailableException e) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_ACCEPTABLE,
                 e.getMessage()
         );
     }

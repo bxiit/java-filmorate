@@ -15,7 +15,7 @@ public class GenreService {
     private final GenreDBStorage genreStorage;
 
     public Genre findGenreById(long genreId) {
-        return this.genreStorage.findGenreById(genreId)
+        return genreStorage.findGenreById(genreId)
                 .orElseThrow(() -> new NotFoundException("Жанр не найден"));
     }
 

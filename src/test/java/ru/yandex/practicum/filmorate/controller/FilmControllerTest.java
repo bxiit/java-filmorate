@@ -6,7 +6,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -27,7 +27,7 @@ class FilmControllerTest extends BaseControllerTest<FilmController> {
     void testFilmModel_shouldThrowValidationException_invalidNameAndDescription() {
         // Название фильма не может быть пустым
         // Описание фильма не может быть длиннее 200 символов
-        NewFilmRequest request = new NewFilmRequest();
+        FilmDto request = new FilmDto();
         request.setName("");
         request.setDescription("film 1 name descriptionfilm 1 name descriptionfilm 1 name description" +
                                "film 1 name descriptionfilm 1 name descriptionfilm 1 name descriptionfilm" +
@@ -51,7 +51,7 @@ class FilmControllerTest extends BaseControllerTest<FilmController> {
         assertThat(validator)
                 .isNotNull();
 
-        Set<ConstraintViolation<NewFilmRequest>> validationResults = validator.validate(request);
+        Set<ConstraintViolation<FilmDto>> validationResults = validator.validate(request);
 
         assertThat(validationResults)
                 .hasSize(2)
@@ -64,7 +64,7 @@ class FilmControllerTest extends BaseControllerTest<FilmController> {
 
     @Test
     void testFilmModel_shouldNotThrowValidationException_releaseDateIsExactlyTheEarliestDate() {
-        NewFilmRequest request = new NewFilmRequest();
+        FilmDto request = new FilmDto();
         request.setName("Earliest film");
         request.setDescription("Description of Earliest film");
         request.setDuration(Duration.ofMinutes(100));
@@ -75,7 +75,7 @@ class FilmControllerTest extends BaseControllerTest<FilmController> {
 
     @Test
     void testFilmModel_shouldThrowValidationException_releaseDateIsInvalid() {
-        NewFilmRequest request = new NewFilmRequest();
+        FilmDto request = new FilmDto();
         request.setName("Earliest film");
         request.setDescription("Description of Earliest film");
         request.setDuration(Duration.ofMinutes(100));
@@ -89,7 +89,7 @@ class FilmControllerTest extends BaseControllerTest<FilmController> {
         assertThat(validator)
                 .isNotNull();
 
-        Set<ConstraintViolation<NewFilmRequest>> validationResults = validator.validate(request);
+        Set<ConstraintViolation<FilmDto>> validationResults = validator.validate(request);
         assertThat(validationResults)
                 .hasSize(1)
                 .anySatisfy(violation -> assertThat(violation.getMessage())

@@ -7,8 +7,6 @@ import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
-import ru.yandex.practicum.filmorate.dto.film.NewFilmRequest;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -29,7 +27,7 @@ public interface FilmMapper {
     @Mapping(target = "duration", source = "request.duration")
     @Mapping(target = "mpa", source = "request.mpa")
     @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
-    Film mapNewFilmToFilm(NewFilmRequest request);
+    Film mapNewFilmToFilm(FilmDto request);
 
     @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
     FilmDto mapToFilmDto(Film film);
@@ -41,7 +39,7 @@ public interface FilmMapper {
     @Mapping(target = "releaseDate", source = "request.releaseDate", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "duration", source = "request.duration", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "mpa", source = "request.mpa", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Film updateFilmFields(@MappingTarget Film film, UpdateFilmRequest request);
+    Film updateFilmFields(@MappingTarget Film film, FilmDto request);
 
     FilmMapper MAPPER = Mappers.getMapper(FilmMapper.class);
 }

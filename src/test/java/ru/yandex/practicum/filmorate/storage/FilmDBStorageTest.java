@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.yandex.practicum.filmorate.dto.film.UpdateFilmRequest;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
@@ -174,7 +174,7 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
         Optional<Film> addedFilmOptional = storage.findFilmById(film.getId());
         Film addedFilm = addedFilmOptional.get();
 
-        UpdateFilmRequest updateUserRequest = new UpdateFilmRequest();
+        FilmDto updateUserRequest = new FilmDto();
         updateUserRequest.setName("updated name");
 
         MpaDto pgMpaDto = new MpaDto();

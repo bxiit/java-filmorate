@@ -8,6 +8,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class UserDto {
@@ -27,4 +28,6 @@ public class UserDto {
     @NotNull(message = "Пустая дата рождения")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthday;
+
+    private Set<Long> friends;
 }

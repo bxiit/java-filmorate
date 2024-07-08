@@ -3,9 +3,11 @@ package ru.yandex.practicum.filmorate.storage;
 import org.assertj.core.data.Index;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
+import ru.yandex.practicum.filmorate.storage.user.friend.FriendStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -16,10 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class UserDBStorageTest extends BaseDBStorageTest<UserDBStorage> {
+    private final FriendStorage friendStorage;
 
     @Autowired
-    public UserDBStorageTest(UserDBStorage userDBStorage) {
+    public UserDBStorageTest(UserDBStorage userDBStorage, @Qualifier("friendDBStorage") FriendStorage friendStorage) {
         super(userDBStorage);
+        this.friendStorage = friendStorage;
     }
 
     @Test
@@ -172,7 +176,7 @@ public class UserDBStorageTest extends BaseDBStorageTest<UserDBStorage> {
                 .build();
         user2 = storage.addUser(user2);
 
-        long friendshipId = storage.addFriend(
+        long friendshipId = friendStorage.addFriend(
                 user1.getId(),
                 user2.getId(),
                 "REQ_USER1"
@@ -181,7 +185,7 @@ public class UserDBStorageTest extends BaseDBStorageTest<UserDBStorage> {
         assertThat(friendshipId)
                 .isGreaterThan(0L);
 
-        List<User> friendsById = storage.findFriendsById(user1.getId());
+        List<User> friendsById = friendStorage.findFriendsById(user1.getId());
         assertThat(friendsById)
                 .isEqualTo(List.of(user2))
                 .contains(user2, Index.atIndex(0));

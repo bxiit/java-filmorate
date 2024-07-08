@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.util.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ru.yandex.practicum.filmorate.util.validator.annotations.MinDuration;
+import ru.yandex.practicum.filmorate.util.annotations.MinDuration;
 
 import java.time.Duration;
 
@@ -17,6 +17,9 @@ public class DurationValidator implements ConstraintValidator<MinDuration, Durat
 
     @Override
     public boolean isValid(Duration value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true;
+        }
         int result = value.compareTo(duration);
         return result > 0;
     }
