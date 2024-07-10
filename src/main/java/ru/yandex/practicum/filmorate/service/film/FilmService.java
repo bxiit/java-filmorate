@@ -2,40 +2,50 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
+import ru.yandex.practicum.filmorate.mappers.GenreMapper;
+import ru.yandex.practicum.filmorate.mappers.MpaMapper;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
+import ru.yandex.practicum.filmorate.model.FilmUserLikes;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmRepository;
+import ru.yandex.practicum.filmorate.storage.film_user_likes.FilmUserLikesRepository;
+import ru.yandex.practicum.filmorate.storage.genre.GenreRepository;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaRepository;
+import ru.yandex.practicum.filmorate.storage.user.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FilmService {
 
-    @Qualifier("FilmDBStorage")
-    private final FilmStorage filmStorage;
+    public static final String USER_NOT_FOUND_MESSAGE = "Пользователь не найден";
+    public static final String FILM_NOT_FOUND_MESSAGE = "Фильм не найден";
 
-    private final MpaDBStorage mpaStorage;
+    private final FilmRepository filmRepository;
 
-    private final GenreDBStorage genreStorage;
+    private final MpaRepository mpaRepository;
+
+    private final GenreRepository genreRepository;
+
+    private final FilmUserLikesRepository likesRepository;
+
+    private final UserRepository userRepository;
 
     public FilmDto addFilm(FilmDto request) {
-        checkMpaExistence(request.getMpa());
-        checkGenreExistence(request.getGenres());
         Film film = FilmMapper.MAPPER.mapNewFilmToFilm(request);
-        film = filmStorage.addFilm(film);
+        filmRepository.save(film);
+        film = filmRepository.getReferenceById(film.getId());
         FilmDto filmDto = FilmMapper.MAPPER.mapToFilmDto(film);
         setGenreName(filmDto);
         setMpaName(filmDto);
@@ -43,28 +53,24 @@ public class FilmService {
     }
 
     public FilmDto findFilmById(long filmId) {
-        FilmDto filmDto = filmStorage.findFilmById(filmId)
+        return filmRepository.findById(filmId)
                 .map(FilmMapper.MAPPER::mapToFilmDto)
-                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
-        setGenreName(filmDto);
-        setMpaName(filmDto);
-        return filmDto;
+                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_MESSAGE));
     }
 
     public List<FilmDto> findAllFilms() {
-        return filmStorage.findAllFilms().stream()
+        return filmRepository.findAll().stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
-                .map(this::setGenreName)
-                .map(this::setMpaName)
                 .toList();
     }
 
     public FilmDto updateFilm(FilmDto request) {
-        Film film = filmStorage.findFilmById(request.getId())
+        Film updatedFilm = filmRepository.findById(request.getId())
                 .map(f -> FilmMapper.MAPPER.updateFilmFields(f, request))
-                .orElseThrow(() -> new NotFoundException("Фильм не найден"));
-        filmStorage.updateFilm(film);
-        FilmDto updatedFilmDto = FilmMapper.MAPPER.mapToFilmDto(film);
+                .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_MESSAGE));
+
+        filmRepository.save(updatedFilm);
+        FilmDto updatedFilmDto = FilmMapper.MAPPER.mapToFilmDto(updatedFilm);
         setGenreName(updatedFilmDto);
         setMpaName(updatedFilmDto);
 
@@ -72,14 +78,14 @@ public class FilmService {
     }
 
     public void deleteFilmById(long filmId) {
-        boolean deleted = filmStorage.deleteFilmById(filmId);
-        if (!deleted) {
-            throw new NotFoundException("Фильм не найден");
-        }
+        filmRepository.deleteById(filmId);
     }
 
+    // fixme: displays only the most liked one
     public List<FilmDto> findPopularFilmsByCount(int count) {
-        return filmStorage.findPopularFilms(count).stream()
+        return likesRepository.findPopularFilmsIds(count).stream()
+                .map(filmRepository::findById)
+                .map(Optional::orElseThrow)
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .map(this::setGenreName)
                 .map(this::setMpaName)
@@ -95,51 +101,33 @@ public class FilmService {
     }
 
     private void likeFilmAction(long filmId, long userId, boolean isLike) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND_MESSAGE));
         if (isLike) {
-            filmStorage.likeFilm(filmId, userId);
+            Film film = filmRepository.findById(filmId)
+                    .orElseThrow(() -> new NotFoundException(FILM_NOT_FOUND_MESSAGE));
+            FilmUserLikes likes = new FilmUserLikes(film, user);
+            likesRepository.save(likes);
         } else {
-            filmStorage.unlikeFilm(filmId, userId);
+            likesRepository.deleteFilmUserLikesByUser(user);
         }
     }
 
     private FilmDto setMpaName(FilmDto filmDto) {
-        if (filmDto.getMpa() != null && filmDto.getMpa().getId() != null) {
-            Mpa mpa = mpaStorage.findMpaById(filmDto.getMpa().getId())
-                    .orElseThrow(() -> new NotFoundException("Рейтинг не найден"));
-            filmDto.getMpa().setName(mpa.getName());
-        }
+        MpaDto mpaDto = mpaRepository.findById(filmDto.getMpa().getId())
+                .map(MpaMapper.MPA_MAPPER::mapToDto)
+                .orElseThrow(() -> new NotFoundException("Рейтинг не найден"));
+        filmDto.setMpa(mpaDto);
         return filmDto;
     }
 
     private FilmDto setGenreName(FilmDto filmDto) {
-        filmDto.getGenres()
-                .forEach(genreDto -> genreStorage.findGenreById(genreDto.getId())
-                        .ifPresent(genre -> genreDto.setName(genre.getName())));
+        Set<GenreDto> genres = filmDto.getGenres().stream()
+                .map(genreDto -> genreRepository.findById(genreDto.getId()))
+                .map(genre -> genre.orElseThrow(() -> new NotFoundException("Жанр не найден")))
+                .map(GenreMapper.GENRE_MAPPER::mapToDto)
+                .collect(Collectors.toSet());
+        filmDto.setGenres(genres);
         return filmDto;
-    }
-
-    private void checkGenreExistence(Set<GenreDto> genres) {
-        if (genres == null) {
-            return;
-        }
-        for (GenreDto genreDto : genres) {
-            if (!doesGenreExist(genreDto.getId())) {
-                throw new ValidationException("Не существующий жанр");
-            }
-        }
-    }
-
-    private void checkMpaExistence(MpaDto mpaDto) {
-        if (mpaDto != null && !doesMpaExist(mpaDto.getId())) {
-            throw new ValidationException("Не существующий рейтинг");
-        }
-    }
-
-    private boolean doesMpaExist(long mpaId) {
-        return mpaStorage.findMpaById(mpaId).isPresent();
-    }
-
-    private boolean doesGenreExist(long genreId) {
-        return genreStorage.findGenreById(genreId).isPresent();
     }
 }

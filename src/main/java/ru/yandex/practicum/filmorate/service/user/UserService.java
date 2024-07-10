@@ -9,7 +9,11 @@ import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
+import ru.yandex.practicum.filmorate.model.Friends;
+import ru.yandex.practicum.filmorate.model.FriendsStatus;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friends.FriendsRepository;
+import ru.yandex.practicum.filmorate.storage.user.UserRepository;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.storage.user.friend.FriendStorage;
 
@@ -23,50 +27,58 @@ public class UserService {
 
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
+    private final UserRepository userRepository;
+    private final FriendsRepository friendsRepository;
 
-    public UserService(@Qualifier("UserDBStorage") UserStorage userStorage, @Qualifier("friendDBStorage") FriendStorage friendStorage) {
+    public UserService(@Qualifier("UserDBStorage") UserStorage userStorage, @Qualifier("friendDBStorage") FriendStorage friendStorage, UserRepository userRepository, FriendsRepository friendsRepository) {
         this.userStorage = userStorage;
         this.friendStorage = friendStorage;
+        this.userRepository = userRepository;
+        this.friendsRepository = friendsRepository;
     }
 
     public UserDto addUser(NewUserRequest request) {
-        User userTest = UserMapper.MAPPER.mapNewUserToUser(request);
-        userTest = userStorage.addUser(userTest);
-        return UserMapper.MAPPER.mapToUserDto(userTest);
+        User user = UserMapper.MAPPER.mapNewUserToUser(request);
+        user = userRepository.save(user);
+        return UserMapper.MAPPER.mapToUserDto(user);
     }
 
     public UserDto findUserById(long userId) {
-        User user = userStorage.findUserById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         setFriendsByUser(userId, user);
         return UserMapper.MAPPER.mapToUserDto(user);
     }
 
     private User setFriendsByUser(long userId, User user) {
-        Set<Long> friendsIds = friendStorage.findFriendsById(userId).stream()
+        List<User> userFriends = friendsRepository.findUserFriends(userId);
+        Set<Long> friendsIds = userFriends.stream()
                 .map(User::getId)
                 .collect(Collectors.toSet());
         user.setFriends(friendsIds);
+//        Set<Long> friendsIds = friendStorage.findFriendsById(userId).stream()
+//                .map(User::getId)
+//                .collect(Collectors.toSet());
+//        user.setFriends(friendsIds);
         return user;
     }
 
     public List<UserDto> findAllUsers() {
-        return userStorage.findAllUsers().stream()
-                .map(user -> setFriendsByUser(user.getId(), user))
+        return userRepository.findAll().stream()
                 .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
     }
 
-    public UserDto updateUser(long userId, UpdateUserRequest request) {
-        User updatedUser = userStorage.findUserById(userId)
+    public UserDto updateUser(UpdateUserRequest request) {
+        User updatedUser = userRepository.findById(request.getId())
                 .map(user -> UserMapper.MAPPER.updateUserFields(user, request))
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-        updatedUser = userStorage.updateUser(updatedUser);
+        userRepository.save(updatedUser);
         return UserMapper.MAPPER.mapToUserDto(updatedUser);
     }
 
     public void deleteUserById(long userId) {
-        userStorage.deleteUserById(userId);
+        userRepository.deleteById(userId);
     }
 
     // USER'S FRIENDS
@@ -74,57 +86,77 @@ public class UserService {
         if (userId == friendId) {
             throw new ConflictException("Вы не можете добавить себя же в друзья");
         }
-        doesUsersExist(userId);
-        doesUsersExist(friendId);
-        String reqStatus = setStatus(userId, friendId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        FriendsStatus reqStatus = setStatus(userId, friendId);
+
+        Friends friends = new Friends();
+        friends.setStatus(reqStatus);
         if (userId < friendId) {
-            friendStorage.addFriend(userId, friendId, reqStatus);
+            friends.setUser1(user);
+            friends.setUser2(friend);
         } else {
-            friendStorage.addFriend(friendId, userId, reqStatus);
+            friends.setUser1(friend);
+            friends.setUser2(user);
         }
+        friendsRepository.save(friends);
     }
 
     public void deleteUsersFriend(long userId, long friendId) {
         if (userId == friendId) {
-            throw new ConflictException("вы не можете добавить себя же в друзья");
+            throw new ConflictException("вы не можете удалить себя же из списка друзей");
         }
-        doesUsersExist(userId);
-        doesUsersExist(friendId);
-        String reqStatus = setStatus(userId, friendId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User friend = userRepository.findById(friendId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+
+        FriendsStatus status = setStatus(userId, friendId);
         if (userId < friendId) {
-            friendStorage.deleteFriend(userId, friendId, reqStatus);
+            friendsRepository.deleteFriendsByUser1AndUser2AndStatus(user, friend, status);
+//            friendStorage.deleteFriend(userId, friendId, reqStatus);
         } else {
-            friendStorage.deleteFriend(friendId, userId, reqStatus);
+            friendsRepository.deleteFriendsByUser1AndUser2AndStatus(friend, user, status);
+//            friendStorage.deleteFriend(friendId, userId, reqStatus);
         }
     }
 
     public List<UserDto> findUsersFriends(long userId) {
-        if (userStorage.findUserById(userId).isEmpty()) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
-        return friendStorage.findFriendsById(userId).stream()
+
+        return friendsRepository.findUserFriends(userId).stream()
                 .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
+//        return friendStorage.findFriendsById(userId).stream()
+//                .map(UserMapper.MAPPER::mapToUserDto)
+//                .toList();
     }
 
     public List<UserDto> findCommonUsers(long userId, long otherUserId) {
-        return friendStorage.findCommonFriends(userId, otherUserId).stream()
+        return friendsRepository.findCommonFriends(userId, otherUserId).stream()
                 .map(UserMapper.MAPPER::mapToUserDto)
                 .toList();
+//        return friendStorage.findCommonFriends(userId, otherUserId).stream()
+//                .map(UserMapper.MAPPER::mapToUserDto)
+//                .toList();
     }
 
-    private String setStatus(long userId, long friendId) {
-        String reqStatus;
+    private FriendsStatus setStatus(long userId, long friendId) {
+        FriendsStatus reqStatus;
         if (userId < friendId) {
-            reqStatus = "REQ_USER1";
+            reqStatus = FriendsStatus.REQ_USER1;
         } else {
-            reqStatus = "REQ_USER2";
+            reqStatus = FriendsStatus.REQ_USER2;
         }
         return reqStatus;
     }
 
     private void doesUsersExist(long userId) {
-        if (userStorage.findUserById(userId).isEmpty()) {
+        if (userRepository.findById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
     }

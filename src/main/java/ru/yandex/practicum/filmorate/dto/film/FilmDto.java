@@ -16,17 +16,10 @@ import ru.yandex.practicum.filmorate.util.annotations.NotBefore;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Data
 public class FilmDto {
-
-    public FilmDto() {
-        this.likedUsersIDs = new HashSet<>();
-        this.genres = new TreeSet<>();
-    }
 
     @Positive(message = "Не валидный идентификатор")
     private Long id;
@@ -46,9 +39,9 @@ public class FilmDto {
     @MinDuration(0)
     private Duration duration;
 
-    private Set<Long> likedUsersIDs;
-
     private MpaDto mpa;
 
     private Set<GenreDto> genres;
+
+    private Set<Long> likedUserIds;
 }

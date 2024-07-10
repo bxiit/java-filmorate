@@ -22,7 +22,7 @@ public class UsersExtractor implements ResultSetExtractor<List<User>> {
             long userId = rs.getLong("user_id");
             if (users.containsKey(userId)) {
                 User user = users.get(userId);
-                user.getFriends().add(rs.getLong("friend_id"));
+//                user.getFriends().add(rs.getLong("friend_id"));
                 continue;
             }
             boolean hasFriendIdColumn = hasFriendIdColumn(rs);
@@ -36,7 +36,7 @@ public class UsersExtractor implements ResultSetExtractor<List<User>> {
                     .login(rs.getString("login"))
                     .email(rs.getString("email"))
                     .birthday(rs.getDate("birthday").toLocalDate())
-                    .friends(friendsIdsSet)
+//                    .friends(friendsIdsSet)
                     .build();
             users.put(userId, user);
         }

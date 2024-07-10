@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,26 +51,26 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
         if (mpaId == 0) {
             return;
         }
-        MpaDto mpaDto = new MpaDto();
-        mpaDto.setId(mpaId);
-        film.setMpa(mpaDto);
+        Mpa mpa = new Mpa();
+        mpa.setId(mpaId);
+        film.setMpa(mpa);
     }
 
     private void addLike(ResultSet rs, Film film) throws SQLException {
-        long likedUserId = rs.getLong("liked_user_id");
-        if (likedUserId == 0) {
-            return;
-        }
-        film.getLikedUsersIDs().add(likedUserId);
+//        long likedUserId = rs.getLong("liked_user_id");
+//        if (likedUserId == 0) {
+//            return;
+//        }
+//        film.getLikedUsersIDs().add(likedUserId);
     }
 
     private void addGenre(ResultSet rs, Film film) throws SQLException {
-        long genreId = rs.getLong("genre_id");
-        if (genreId == 0) {
-            return;
-        }
-        GenreDto genreDto = new GenreDto();
-        genreDto.setId(genreId);
-        film.getGenres().add(genreDto);
+//        long genreId = rs.getLong("genre_id");
+//        if (genreId == 0) {
+//            return;
+//        }
+//        GenreDto genreDto = new GenreDto();
+//        genreDto.setId(genreId);
+//        film.getGenres().add(genreDto);
     }
 }

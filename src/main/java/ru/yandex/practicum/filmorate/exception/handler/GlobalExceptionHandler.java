@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.exception.handler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -67,5 +70,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_ACCEPTABLE,
                 e.getMessage()
         );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        if (e.getCause() instanceof JdbcSQLIntegrityConstraintViolationException jdbcException &&
+            jdbcException.getErrorCode() == 23505) {
+            return ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        } else if (e.getCause() instanceof ConstraintViolationException violationException) {
+            return ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        } else {
+            return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Что то пошло не так");
+        }
     }
 }

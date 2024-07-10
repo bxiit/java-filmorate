@@ -9,9 +9,9 @@ spring:
   output:
     ansi:
       enabled: never
-  sql:
-    init:
-      mode: always
+#  sql:
+#    init:
+#      mode: always
   datasource:
     url: jdbc:h2:file:./db/filmorate;
     driverClassName: org.h2.Driver
@@ -19,6 +19,14 @@ spring:
     password: password
   h2:
     console:
-      enabled: false
+      enabled: true
   jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
+    properties:
+      hibernate:
+        format_sql: true
+#  profiles:
+#    active: dev

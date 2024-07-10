@@ -58,7 +58,7 @@ public class UserController {
     @ResponseStatus(OK)
     public UserDto updateUser(@Valid @RequestBody UpdateUserRequest request) {
         log.info("Обновление пользователя");
-        UserDto updatedUser = userService.updateUser(request.getId(), request);
+        UserDto updatedUser = userService.updateUser(request);
         log.info("Пользователь с ID = {} успешно обновлен", request.getId());
         return updatedUser;
     }

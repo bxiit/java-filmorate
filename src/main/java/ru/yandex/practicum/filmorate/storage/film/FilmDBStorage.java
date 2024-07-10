@@ -100,9 +100,9 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
         }
 
         film.setId(filmId);
-        for (GenreDto genreDto : film.getGenres()) {
-            insertFilmGenre(filmId, genreDto.getId());
-        }
+//        for (GenreDto genreDto : film.getGenres()) {
+//            insertFilmGenre(filmId, genreDto.getId());
+//        }
         return film;
     }
 
@@ -148,9 +148,9 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
         );
 
         // инсерт жанров которые есть у обновляемого фильма
-        for (GenreDto genreDto : film.getGenres()) {
-            insertFilmGenre(film.getId(), genreDto.getId());
-        }
+//        for (GenreDto genreDto : film.getGenres()) {
+//            insertFilmGenre(film.getId(), genreDto.getId());
+//        }
 
         return film;
     }

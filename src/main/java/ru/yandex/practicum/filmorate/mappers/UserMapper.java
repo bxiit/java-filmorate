@@ -14,21 +14,19 @@ import ru.yandex.practicum.filmorate.model.User;
 @Mapper(builder = @Builder(disableBuilder = true), componentModel = "spring")
 public interface UserMapper {
 
-    @Mapping(target = "friends", expression = "java(user.getFriends())")
+    @Mapping(target = "id", source = "user.id")
     UserDto mapToUserDto(User user);
 
-    @Mapping(target = "friends", expression = "java(new java.util.HashSet<>())")
     User toUser(UserDto userDto);
 
-    @Mapping(target = "friends", expression = "java(new java.util.HashSet<>())")
     User mapNewUserToUser(NewUserRequest request);
 
 
     @Mapping(ignore = true, target = "id")
-    @Mapping(target = "email", source = "request.email", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "name", source = "request.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "login", source = "request.login", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "birthday", source = "request.birthday", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+//    @Mapping(target = "email", source = "request.email", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+//    @Mapping(target = "name", source = "request.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+//    @Mapping(target = "login", source = "request.login", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+//    @Mapping(target = "birthday", source = "request.birthday", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     User updateUserFields(@MappingTarget User user, UpdateUserRequest request);
 
     UserMapper MAPPER = Mappers.getMapper(UserMapper.class);
