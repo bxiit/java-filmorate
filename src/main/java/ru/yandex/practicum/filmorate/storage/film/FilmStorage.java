@@ -15,4 +15,10 @@ public interface FilmStorage {
     Film updateFilm(Film film);
 
     boolean deleteFilmById(long filmId);
+
+    List<Film> findPopularFilms(long count);
+
+    boolean likeFilm(long filmId, long userId);
+
+    boolean unlikeFilm(long filmId, long userId);
 }

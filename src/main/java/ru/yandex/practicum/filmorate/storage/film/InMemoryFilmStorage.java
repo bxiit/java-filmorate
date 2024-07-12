@@ -44,6 +44,21 @@ public class InMemoryFilmStorage implements FilmStorage {
         return filmId == removedFilm.getId();
     }
 
+    @Override
+    public List<Film> findPopularFilms(long count) {
+        return List.of();
+    }
+
+    @Override
+    public boolean likeFilm(long filmId, long userId) {
+        return false;
+    }
+
+    @Override
+    public boolean unlikeFilm(long filmId, long userId) {
+        return false;
+    }
+
     private Long getMaxId() {
         return IdGenerator.getMaxIdOfFilms();
     }

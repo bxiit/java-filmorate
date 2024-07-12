@@ -1,0 +1,24 @@
+logging:
+  level:
+    org.zalando.logbook: off
+spring:
+  banner:
+    location: classpath:banners/banner.txt
+  main:
+    log-startup-info: false
+  output:
+    ansi:
+      enabled: never
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:h2:file:./db/filmorate;
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  h2:
+    console:
+      enabled: false
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect

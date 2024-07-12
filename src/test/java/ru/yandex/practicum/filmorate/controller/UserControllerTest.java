@@ -8,10 +8,9 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.user.UserDto;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -19,29 +18,29 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class UserControllerTest {
+class UserControllerTest extends BaseControllerTest<UserController> {
 
-    static UserController userController;
     static ObjectMapper objectMapper = new ObjectMapper();
+
+    @Autowired
+    public UserControllerTest(UserController controller) {
+        super(controller);
+    }
 
     @BeforeAll
     static void setUp() {
-        UserService userService = new UserService(new InMemoryUserStorage());
-        userController = new UserController(userService);
         objectMapper.registerModules(new JavaTimeModule());
     }
 
     @Test
-    void testUserModel_shouldThrowNullPointerException_releaseDateIsNull() {
-        User user = User.builder()
-                .name("Bexeiit")
-                .email("bexeiitatabek@yandex.kz")
-                .birthday(null)
-                .login("nickname")
-                .build();
+    void testUserModel_shouldValidateAndHaveMessageAboutEmptyBirthday_releaseDateIsNull() {
+        NewUserRequest request = new NewUserRequest();
+        request.setName("Bexeiit");
+        request.setBirthday(null);
+        request.setEmail("bexeiitatabek@yandex.kz");
+        request.setLogin("nickname");
 
         Validator validator;
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -50,23 +49,19 @@ class UserControllerTest {
 
         assertNotNull(validator);
 
-        Set<ConstraintViolation<User>> validatedUserSet = validator.validate(user);
+        Set<ConstraintViolation<NewUserRequest>> validatedUserSet = validator.validate(request);
         assertEquals(1, validatedUserSet.size());
         assertTrue(validatedUserSet.stream()
                 .anyMatch(results -> results.getMessage().equals("Пустая дата рождения")));
-
-        // при валидации null.isAfter() бросить NPE
-        assertThrows(NullPointerException.class, () -> userController.addUser(user));
     }
 
     @Test
     void testUserModel_shouldReturnMessageAboutInvalidEmail_invalidEmail() {
-        User user = User.builder()
-                .name("Bexeiit")
-                .email("@@@bexeiitatabekyandex.kz")
-                .birthday(LocalDate.of(2004, Month.NOVEMBER, 16))
-                .login("nickname")
-                .build();
+        NewUserRequest request = new NewUserRequest();
+        request.setName("Bexeiit");
+        request.setBirthday(LocalDate.of(2004, Month.NOVEMBER, 16));
+        request.setEmail("@@bexeiitatabekyandex.kz");
+        request.setLogin("nickname");
 
         Validator validator;
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -75,7 +70,7 @@ class UserControllerTest {
 
         assertNotNull(validator);
 
-        Set<ConstraintViolation<User>> validatedUserSet = validator.validate(user);
+        Set<ConstraintViolation<NewUserRequest>> validatedUserSet = validator.validate(request);
         assertEquals(1, validatedUserSet.size());
         assertTrue(validatedUserSet.stream()
                 .anyMatch(results -> results.getMessage().equals("Неверный формат электронной почты")));
@@ -83,12 +78,11 @@ class UserControllerTest {
 
     @Test
     void testUserModel_shouldNotReturnAnything() {
-        User user = User.builder()
-                .name("Bexeiit")
-                .login("nickname")
-                .email("bexeiitatabek@yandex.kz")
-                .birthday(LocalDate.of(2004, Month.NOVEMBER, 16))
-                .build();
+        NewUserRequest request = new NewUserRequest();
+        request.setName("Bexeiit");
+        request.setBirthday(LocalDate.of(2004, Month.NOVEMBER, 16));
+        request.setEmail("bexeiitatabek@yandex.kz");
+        request.setLogin("nickname");
 
         Validator validator;
         try (ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -97,45 +91,43 @@ class UserControllerTest {
 
         assertNotNull(validator);
 
-        Set<ConstraintViolation<User>> validatedUserSet = validator.validate(user);
+        Set<ConstraintViolation<NewUserRequest>> validatedUserSet = validator.validate(request);
         assertEquals(0, validatedUserSet.size());
 
-        ResponseEntity<User> userResponseEntity = userController.addUser(user);
-        User userResponseEntityBody = userResponseEntity.getBody();
-        assertNotNull(userResponseEntityBody);
-        assertNotNull(userResponseEntityBody.getId());
-        assertTrue(userResponseEntityBody.getId() > 0);
-        assertEquals("Bexeiit", userResponseEntityBody.getName());
-        assertEquals("nickname", userResponseEntityBody.getLogin());
-        assertEquals("bexeiitatabek@yandex.kz", userResponseEntityBody.getEmail());
-        assertEquals(LocalDate.of(2004, Month.NOVEMBER, 16), userResponseEntityBody.getBirthday());
+        UserDto userResponseEntity = controller.addUser(request);
+        assertNotNull(userResponseEntity);
+        assertNotNull(userResponseEntity.getId());
+        assertTrue(userResponseEntity.getId() > 0);
+        assertEquals("Bexeiit", userResponseEntity.getName());
+        assertEquals("nickname", userResponseEntity.getLogin());
+        assertEquals("bexeiitatabek@yandex.kz", userResponseEntity.getEmail());
+        assertEquals(LocalDate.of(2004, Month.NOVEMBER, 16), userResponseEntity.getBirthday());
     }
 
     @Test
     void testUsersIds_shouldReturnSequencedIds() {
-        User user = User.builder()
-                .name("testId name")
-                .login("testId-login")
-                .email("testId@gmail.com")
-                .birthday(LocalDate.now())
-                .build();
+        NewUserRequest request = new NewUserRequest();
+        request.setName("testId name");
+        request.setLogin("testId-login");
+        request.setBirthday(LocalDate.now());
+        request.setEmail("testId@gmail.com");
 
-        ResponseEntity<User> userResponseEntity = userController.addUser(user);
-        User userFromBody = userResponseEntity.getBody();
-        assertNotNull(userFromBody);
-        assertNotNull(userFromBody.getId());
-        assertTrue(userFromBody.getId() > 0);
+        UserDto userDto = controller.addUser(request);
+        assertNotNull(userDto);
+        assertNotNull(userDto.getId());
+        assertTrue(userDto.getId() > 0);
 
-        User user1 = user.toBuilder()
-                .email("testId2@gmail.com")
-                .build();
-        ResponseEntity<User> userResponseEntity1 = userController.addUser(user1);
-        User user1FromBody = userResponseEntity1.getBody();
-        assertNotNull(user1FromBody);
-        assertNotNull(user1FromBody.getId());
-        assertTrue(user1FromBody.getId() > 0);
+        NewUserRequest request1 = new NewUserRequest();
+        request1.setName("testId name");
+        request1.setLogin("testId-login1");
+        request1.setBirthday(LocalDate.now());
+        request1.setEmail("testId2@gmail.com");
+        UserDto userDto1 = controller.addUser(request1);
+        assertNotNull(userDto1);
+        assertNotNull(userDto1.getId());
+        assertTrue(userDto1.getId() > 0);
 
-        assertTrue(userFromBody.getId() < user1FromBody.getId());
-        assertEquals(userFromBody.getId() + 1, user1FromBody.getId());
+        assertTrue(userDto.getId() < userDto1.getId());
+        assertEquals(userDto.getId() + 1, userDto1.getId());
     }
 }

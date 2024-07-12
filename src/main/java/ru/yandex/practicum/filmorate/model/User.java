@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -11,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Builder(toBuilder = true)
 public class User {
     private Long id;
