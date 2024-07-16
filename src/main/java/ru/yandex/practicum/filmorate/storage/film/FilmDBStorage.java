@@ -79,19 +79,30 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             WHERE (FILM_ID = ? AND USER_ID = ?);
             """;
     private static final String COMMON_FILMS_ORDERED_POPULARITY = """
-            SELECT USER1_FILMS.FILM_ID AS FILM_ID
-            FROM FILM_USER_LIKES AS USER1_FILMS
-            WHERE USER_ID = ?
-            INNER JOIN (
-                SELECT SELECT FILM_ID
-                FROM FILM_USER_LIKES
-                WHERE USER_ID = ?) AS USER2_FILMS ON USER1_FILMS.FILM_ID = USER2_FILMS.FILM_ID
-            LEFT JOIN (
-                SELECT FILM_ID,
-                       COUNT(USER_ID) AS POP
-                FROM FILM_USER_LIKES) AS POPULARITY ON USER1_FILMS.FILM_ID = POPULARITY_FILMS.FILM_ID
-            GROUP BY POPULARITY.POP
-            ORDER BY POPULARITY.POP DESC;
+            SELECT F.FILM_ID AS film_id,
+                   F.NAME AS name,
+                   F.DESCRIPTION AS description,
+                   F.RELEASE_DATE AS release_date,
+                   F.DURATION AS duration,
+                   F.MPA_ID AS mpa_id,
+                   FG.GENRE_ID AS genre_id,
+                   FUL.USER_ID as liked_user_id
+            FROM (SELECT COMMON_FILMS.FILM_ID
+                  FROM (SELECT FILM_ID
+                        FROM (SELECT FILM_ID,
+                                     COUNT(USER_ID) AS USER_LIKES
+                             FROM FILM_USER_LIKES
+                              WHERE USER_ID IN (?, ?)
+                              GROUP BY FILM_ID)
+                        WHERE USER_LIKES = 2) AS COMMON_FILMS
+                  LEFT JOIN (SELECT FILM_ID,
+                                     COUNT(USER_ID) AS USER_LIKES
+                              FROM FILM_USER_LIKES
+                              GROUP BY FILM_ID) AS POPULARITY ON COMMON_FILMS.FILM_ID = POPULARITY.FILM_ID
+                  ORDER BY POPULARITY.USER_LIKES DESC) AS SORTED_COMMON_FILMS
+            LEFT JOIN FILM AS F ON SORTED_COMMON_FILMS.FILM_ID = F.FILM_ID
+            LEFT JOIN FILM_GENRE FG on SORTED_COMMON_FILMS.FILM_ID = FG.FILM_ID
+            LEFT JOIN FILM_USER_LIKES FUL on SORTED_COMMON_FILMS.FILM_ID = FUL.FILM_ID;
             """;
 
     public FilmDBStorage(JdbcTemplate jdbc, RowMapper<Film> rowMapper, ResultSetExtractor<List<Film>> extractor) {
@@ -190,7 +201,7 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
     }
 
     @Override
-    public List<Long> getCommonFilmsIdsWithAnotherUser(long userId, long friendId) {
-        return jdbc.queryForList(COMMON_FILMS_ORDERED_POPULARITY, Long.class, userId, friendId);
+    public List<Film> getCommonFilmsIdsWithAnotherUser(long userId, long friendId) {
+        return findManyWithExtractor(COMMON_FILMS_ORDERED_POPULARITY, userId, friendId);
     }
 }

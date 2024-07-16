@@ -18,7 +18,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -148,15 +147,13 @@ public class FilmService {
         return genreStorage.findGenreById(genreId).isPresent();
     }
 
-    public List<FilmDto> commonFilmsWithFriend (long userId, long friendId) {
+    public List<FilmDto> commonFilmsWithFriend(long userId, long friendId) {
         UserDto user = userService.findUserById(userId);
-        if (!user.getFriends().contains(userId)) {
-            throw new NotFoundException(String.format("Друг с id = %d не найден", friendId));
-        }
-        List<Long> commonFilmsIds = filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId);
-        if (commonFilmsIds == null) {
-            return new ArrayList<>();
-        }
-        return null;
+        UserDto friend = userService.findUserById(friendId);
+        return filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
     }
 }
