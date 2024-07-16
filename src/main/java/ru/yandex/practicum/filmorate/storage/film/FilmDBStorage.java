@@ -40,6 +40,22 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             order by likes desc
             limit ?;
             """;
+    private static final String FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY = """
+            select f.FILM_ID,
+                   count(FUL.USER_ID) as likes
+            from (select *
+                    from (select * 
+                            from FILM
+                            where EXTRACT(YEAR FROM date(release_date)) = ?
+                            ) as f
+                    join film_genre fg on f.film_id = fg.film_id
+                    where fg.genre_id = ?
+                    ) as f
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            group by f.FILM_ID
+            order by likes desc
+            limit ?;
+            """;
     private static final String FIND_BY_ID_QUERY = """
             select f.*,
                                       FG.GENRE_ID,
@@ -123,6 +139,18 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
     public List<Film> findPopularFilms(long count) {
         List<Film> filmsByLikes = new ArrayList<>();
         SqlRowSet sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_QUERY, count);
+        while (sqlRowSet.next()) {
+            long filmId = sqlRowSet.getLong("film_id");
+            Film film = findFilmById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден"));
+            filmsByLikes.add(film);
+        }
+        return filmsByLikes;
+    }
+
+    @Override
+    public List<Film> findPopularFilmsByGenreAndYear(int count, int genreId, int year) {
+        List<Film> filmsByLikes = new ArrayList<>();
+        SqlRowSet sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY, year, genreId, count);
         while (sqlRowSet.next()) {
             long filmId = sqlRowSet.getLong("film_id");
             Film film = findFilmById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден"));
