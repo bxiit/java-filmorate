@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -101,6 +102,10 @@ public class FilmService {
                     )
                     .toList();
         }
+
+        films = films.stream()
+                .sorted(Comparator.comparingInt(film -> film.getLikedUsersIDs().size()))
+                .toList().reversed();
 
         return films.stream().limit(count)
                 .map(FilmMapper.MAPPER::mapToFilmDto)
