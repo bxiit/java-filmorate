@@ -86,18 +86,23 @@ public class FilmService {
                 .toList();
     }
 
-    public List<FilmDto> findPopularFilmsByGenreAndYear(int count, int genreId, int year) {
-        /*return filmStorage.findAllFilms().stream()
-                .filter(film -> film.getReleaseDate().getYear() == year)
-                .filter(film -> film.getGenres().stream()
-                        .findAny().get().getId() == genreId)
+    public List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
+        List<Film> films = filmStorage.findAllFilms();
 
-                .map(FilmMapper.MAPPER::mapToFilmDto)
-                .map(this::setGenreName)
-                .map(this::setMpaName)
-                .toList();*/
+        if (year != null) {
+            films = films.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == year)
+                    .toList();
+        }
+        if (genreId != null) {
+            films = films.stream()
+                    .filter(film -> film.getGenres().stream()
+                            .anyMatch(genreDto -> genreDto.getId().equals(genreId))
+                    )
+                    .toList();
+        }
 
-        return filmStorage.findPopularFilmsByGenreAndYear(count, genreId, year).stream()
+        return films.stream().limit(count)
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .map(this::setGenreName)
                 .map(this::setMpaName)

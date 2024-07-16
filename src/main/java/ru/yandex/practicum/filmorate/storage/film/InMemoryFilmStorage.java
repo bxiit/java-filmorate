@@ -50,15 +50,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findPopularFilmsByGenreAndYear(int count, int genreId, int year) {
-        return films.values().stream()
-                .filter(film -> film.getReleaseDate().getYear() == year)
-                .filter(film -> film.getGenres().stream()
-                        .findAny().get().getId() == genreId)
-                .toList();
-    }
-
-    @Override
     public boolean likeFilm(long filmId, long userId) {
         return false;
     }
