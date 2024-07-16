@@ -78,6 +78,21 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             DELETE FROM FILM_USER_LIKES
             WHERE (FILM_ID = ? AND USER_ID = ?);
             """;
+    private static final String COMMON_FILMS_ORDERED_POPULARITY = """
+            SELECT USER1_FILMS.FILM_ID AS FILM_ID
+            FROM FILM_USER_LIKES AS USER1_FILMS
+            WHERE USER_ID = ?
+            INNER JOIN (
+                SELECT SELECT FILM_ID
+                FROM FILM_USER_LIKES
+                WHERE USER_ID = ?) AS USER2_FILMS ON USER1_FILMS.FILM_ID = USER2_FILMS.FILM_ID
+            LEFT JOIN (
+                SELECT FILM_ID,
+                       COUNT(USER_ID) AS POP
+                FROM FILM_USER_LIKES) AS POPULARITY ON USER1_FILMS.FILM_ID = POPULARITY_FILMS.FILM_ID
+            GROUP BY POPULARITY.POP
+            ORDER BY POPULARITY.POP DESC;
+            """;
 
     public FilmDBStorage(JdbcTemplate jdbc, RowMapper<Film> rowMapper, ResultSetExtractor<List<Film>> extractor) {
         super(jdbc, rowMapper, extractor);
@@ -172,5 +187,10 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
     @Override
     public boolean unlikeFilm(long filmId, long userId) {
         return delete(UNLIKE_FILM, filmId, userId);
+    }
+
+    @Override
+    public List<Long> getCommonFilmsIdsWithAnotherUser(long userId, long friendId) {
+        return jdbc.queryForList(COMMON_FILMS_ORDERED_POPULARITY, Long.class, userId, friendId);
     }
 }

@@ -7,15 +7,18 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
+import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +33,8 @@ public class FilmService {
     private final MpaDBStorage mpaStorage;
 
     private final GenreDBStorage genreStorage;
+
+    private final UserService userService;
 
     public FilmDto addFilm(FilmDto request) {
         checkMpaExistence(request.getMpa());
@@ -141,5 +146,17 @@ public class FilmService {
 
     private boolean doesGenreExist(long genreId) {
         return genreStorage.findGenreById(genreId).isPresent();
+    }
+
+    public List<FilmDto> commonFilmsWithFriend (long userId, long friendId) {
+        UserDto user = userService.findUserById(userId);
+        if (!user.getFriends().contains(userId)) {
+            throw new NotFoundException(String.format("Друг с id = %d не найден", friendId));
+        }
+        List<Long> commonFilmsIds = filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId);
+        if (commonFilmsIds == null) {
+            return new ArrayList<>();
+        }
+        return null;
     }
 }
