@@ -62,4 +62,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     private Long getMaxId() {
         return IdGenerator.getMaxIdOfFilms();
     }
+
+    @Override
+    public List<Film> getFilmRecommendations(long userId) {
+        return null;
+    }
 }
