@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service.user;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
@@ -10,6 +11,7 @@ import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.storage.user.friend.FriendStorage;
 
@@ -23,10 +25,14 @@ public class UserService {
 
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
+    private final FilmService filmService;
 
-    public UserService(@Qualifier("UserDBStorage") UserStorage userStorage, @Qualifier("friendDBStorage") FriendStorage friendStorage) {
+    public UserService(@Qualifier("UserDBStorage") UserStorage userStorage,
+                       @Qualifier("friendDBStorage") FriendStorage friendStorage,
+                       FilmService filmService) {
         this.userStorage = userStorage;
         this.friendStorage = friendStorage;
+        this.filmService = filmService;
     }
 
     public UserDto addUser(NewUserRequest request) {
@@ -127,5 +133,10 @@ public class UserService {
         if (userStorage.findUserById(userId).isEmpty()) {
             throw new NotFoundException("Пользователь не найден");
         }
+    }
+
+    public List<FilmDto> getFilmRecommendations(long userId) {
+        UserDto userDto = findUserById(userId); //Проверка, что пользователь существует
+        return filmService.getFilmRecommendations(userId);
     }
 }

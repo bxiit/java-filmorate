@@ -147,6 +147,14 @@ public class FilmService {
         return genreStorage.findGenreById(genreId).isPresent();
     }
 
+    public List<FilmDto> getFilmRecommendations(long userId) {
+        return filmStorage.getFilmRecommendations(userId).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
+
     public List<FilmDto> commonFilmsWithFriend(long userId, long friendId) {
         UserDto user = userService.findUserById(userId);
         UserDto friend = userService.findUserById(friendId);
