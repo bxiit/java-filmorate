@@ -1,10 +1,4 @@
-drop table if exists FILM_GENRE;
-drop table if exists FILM_USER_LIKES;
-drop table if exists FILM;
-drop table if exists FRIENDS;
-drop table if exists GENRE;
-drop table if exists MPA;
-drop table if exists USERS;
+DROP ALL OBJECTS;
 
 CREATE TABLE IF NOT EXISTS users
 (
