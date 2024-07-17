@@ -87,19 +87,24 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
                    F.MPA_ID AS mpa_id,
                    FG.GENRE_ID AS genre_id,
                    FUL.USER_ID as liked_user_id
-            FROM (SELECT COMMON_FILMS.FILM_ID
-                  FROM (SELECT FILM_ID
-                        FROM (SELECT FILM_ID,
-                                     COUNT(USER_ID) AS USER_LIKES
-                             FROM FILM_USER_LIKES
-                              WHERE USER_ID IN (?, ?)
-                              GROUP BY FILM_ID)
-                        WHERE USER_LIKES = 2) AS COMMON_FILMS
-                  LEFT JOIN (SELECT FILM_ID,
-                                     COUNT(USER_ID) AS USER_LIKES
-                              FROM FILM_USER_LIKES
-                              GROUP BY FILM_ID) AS POPULARITY ON COMMON_FILMS.FILM_ID = POPULARITY.FILM_ID
-                  ORDER BY POPULARITY.USER_LIKES DESC) AS SORTED_COMMON_FILMS
+            FROM (
+                SELECT COMMON_FILMS.FILM_ID
+                FROM (
+                    SELECT FILM_ID
+                    FROM FILM_USER_LIKES
+                    WHERE USER_ID = ?
+                    AND FILM_ID IN (
+                        SELECT FILM_ID
+                        FROM FILM_USER_LIKES
+                        WHERE USER_ID = ?)
+                    ) AS COMMON_FILMS
+                LEFT JOIN (
+                    SELECT FILM_ID,
+                           COUNT(USER_ID) AS USER_LIKES
+                    FROM FILM_USER_LIKES
+                    GROUP BY FILM_ID) AS POPULARITY ON COMMON_FILMS.FILM_ID = POPULARITY.FILM_ID
+                ORDER BY POPULARITY.USER_LIKES DESC
+                ) AS SORTED_COMMON_FILMS
             LEFT JOIN FILM AS F ON SORTED_COMMON_FILMS.FILM_ID = F.FILM_ID
             LEFT JOIN FILM_GENRE FG on SORTED_COMMON_FILMS.FILM_ID = FG.FILM_ID
             LEFT JOIN FILM_USER_LIKES FUL on SORTED_COMMON_FILMS.FILM_ID = FUL.FILM_ID;
