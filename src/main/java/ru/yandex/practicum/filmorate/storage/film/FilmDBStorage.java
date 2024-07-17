@@ -41,45 +41,44 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             limit ?;
             """;
     private static final String FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY = """
-            select f.FILM_ID,
-                   count(FUL.USER_ID) as likes
-            from (select fm.FILM_ID
-                    from (select FILM.FILM_ID
-                            from FILM
-                            where EXTRACT(YEAR FROM CAST(FILM.RELEASE_DATE AS date)) = ?
-                            ) as fm
-                    join film_genre fg on fm.FILM_ID = fg.FILM_ID
-                    where fg.genre_id = ?
-                    ) as f
+            select *,
+            FUL.USER_ID as liked_user_id
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
             left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
-            group by f.FILM_ID
-            order by likes desc
-            limit ?;
+            join (select FUL.FILM_ID, count(FUL.USER_ID) as count
+                  from PUBLIC.FILM_USER_LIKES FUL
+             	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
+            where EXTRACT(YEAR FROM CAST(f.RELEASE_DATE AS date)) = ?
+            and GENRE_ID = ?
+            order by likes.count desc
+            limit ?
             """;
     private static final String FIND_POPULAR_FILM_IDS_BY_YEAR_QUERY = """
-            select f.FILM_ID,
-                   count(FUL.USER_ID) as likes
-            from (select FILM.FILM_ID
-                    from FILM
-                    where EXTRACT(YEAR FROM CAST(FILM.RELEASE_DATE AS date)) = ?
-                    ) as f
+            select *,
+            FUL.USER_ID as liked_user_id
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
             left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
-            group by f.FILM_ID
-            order by likes desc
-            limit ?;
+            join (select FUL.FILM_ID, count(FUL.USER_ID) as count
+                  from PUBLIC.FILM_USER_LIKES FUL
+             	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
+            where EXTRACT(YEAR FROM CAST(f.RELEASE_DATE AS date)) = ?
+            order by likes.count desc
+            limit ?
             """;
     private static final String FIND_POPULAR_FILM_IDS_BY_GENRE_QUERY = """
-            select f.FILM_ID,
-                   count(FUL.USER_ID) as likes
-            from (select fm.FILM_ID
-                    from FILM as fm
-                    join film_genre fg on fm.FILM_ID = fg.FILM_ID
-                    where fg.GENRE_ID = ?
-                    ) as f
+            select *,
+            FUL.USER_ID as liked_user_id
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
             left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
-            group by f.FILM_ID
-            order by likes desc
-            limit ?;
+            join (select FUL.FILM_ID, count(FUL.USER_ID) as count
+                  from PUBLIC.FILM_USER_LIKES FUL
+             	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
+            where GENRE_ID = ?
+            order by likes.count desc
+            limit ?
             """;
     private static final String FIND_BY_ID_QUERY = """
             select f.*,
@@ -174,29 +173,20 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public List<Film> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
-        List<Film> filmsByLikes = new ArrayList<>();
-        SqlRowSet sqlRowSet;
 
         if (year != null) {
             if (genreId != null) {
-                sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY, year, genreId, count);
+                return findManyWithExtractor(FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY, year, genreId, count);
             } else {
-                sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_YEAR_QUERY, year, count);
+                return findManyWithExtractor(FIND_POPULAR_FILM_IDS_BY_YEAR_QUERY, year, count);
             }
         } else {
             if (genreId != null) {
-                sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_GENRE_QUERY, genreId, count);
+                 return findManyWithExtractor(FIND_POPULAR_FILM_IDS_BY_GENRE_QUERY, genreId, count);
             } else {
                 return findPopularFilms(count);
             }
         }
-
-        while (sqlRowSet.next()) {
-            long filmId = sqlRowSet.getLong("film_id");
-            Film film = findFilmById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден"));
-            filmsByLikes.add(film);
-        }
-        return filmsByLikes;
     }
 
     @Override
