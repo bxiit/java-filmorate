@@ -108,7 +108,7 @@ public class UserController {
 
     @GetMapping("/{id}/recommendations")
     @ResponseStatus(OK)
-    public List<FilmDto> getFilmRecommendations (@PathVariable("id") long userId) {
+    public List<FilmDto> getFilmRecommendations(@PathVariable("id") long userId) {
         return userService.getFilmRecommendations(userId);
     }
 }

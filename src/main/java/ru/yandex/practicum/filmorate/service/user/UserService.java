@@ -135,7 +135,7 @@ public class UserService {
         }
     }
 
-    public List<FilmDto> getFilmRecommendations (long userId) {
+    public List<FilmDto> getFilmRecommendations(long userId) {
         UserDto userDto = findUserById(userId); //Проверка, что пользователь существует
         return filmService.getFilmRecommendations(userId);
     }
