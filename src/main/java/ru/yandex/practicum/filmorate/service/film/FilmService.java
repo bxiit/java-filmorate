@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -80,6 +81,33 @@ public class FilmService {
 
     public List<FilmDto> findPopularFilmsByCount(int count) {
         return filmStorage.findPopularFilms(count).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
+
+    public List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
+        List<Film> films = filmStorage.findAllFilms();
+
+        if (year != null) {
+            films = films.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == year)
+                    .toList();
+        }
+        if (genreId != null) {
+            films = films.stream()
+                    .filter(film -> film.getGenres().stream()
+                            .anyMatch(genreDto -> genreDto.getId().equals(genreId))
+                    )
+                    .toList();
+        }
+
+        films = films.stream()
+                .sorted(Comparator.comparingInt(film -> film.getLikedUsersIDs().size()))
+                .toList().reversed();
+
+        return films.stream().limit(count)
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .map(this::setGenreName)
                 .map(this::setMpaName)
