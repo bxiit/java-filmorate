@@ -142,4 +142,9 @@ public class FilmService {
     private boolean doesGenreExist(long genreId) {
         return genreStorage.findGenreById(genreId).isPresent();
     }
+
+    public List<FilmDto> getFilmRecommendations (long userId) {
+
+        return null;
+    }
 }

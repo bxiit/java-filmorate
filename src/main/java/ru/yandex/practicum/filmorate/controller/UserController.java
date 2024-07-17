@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
@@ -103,5 +104,11 @@ public class UserController {
     ) {
         log.info("Получение общих друзей пользователя с ID = {} и ID = {}", userId, otherUserId);
         return userService.findCommonUsers(userId, otherUserId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    @ResponseStatus(OK)
+    public List<FilmDto> getFilmRecommendations (@PathVariable("id") long userId) {
+        return userService.getFilmRecommendations(userId);
     }
 }
