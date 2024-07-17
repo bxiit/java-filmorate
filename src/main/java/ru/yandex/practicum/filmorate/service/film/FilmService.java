@@ -7,13 +7,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
-import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
@@ -32,8 +30,6 @@ public class FilmService {
     private final MpaDBStorage mpaStorage;
 
     private final GenreDBStorage genreStorage;
-
-    private final UserService userService;
 
     public FilmDto addFilm(FilmDto request) {
         checkMpaExistence(request.getMpa());
@@ -156,8 +152,6 @@ public class FilmService {
     }
 
     public List<FilmDto> commonFilmsWithFriend(long userId, long friendId) {
-        UserDto user = userService.findUserById(userId);
-        UserDto friend = userService.findUserById(friendId);
         return filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId).stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .map(this::setGenreName)
