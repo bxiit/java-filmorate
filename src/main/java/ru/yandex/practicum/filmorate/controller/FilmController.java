@@ -63,9 +63,9 @@ public class FilmController {
     @ResponseStatus(OK)
     public List<FilmDto> getPopularFilms(
             @RequestParam(value = "count", defaultValue = "10") int count,
-            @RequestParam(value = "genreId", defaultValue = "-1") int genreId,
-            @RequestParam(value = "year", defaultValue = "-1") int year) {
-        if (genreId == -1 || year == -1) {
+            @RequestParam(value = "genreId", required = false) Long genreId,
+            @RequestParam(value = "year", required = false) Integer year) {
+        if (genreId == null && year == null) {
             return filmService.findPopularFilmsByCount(count);
         } else {
             return filmService.findPopularFilmsByGenreAndYear(count, genreId, year);

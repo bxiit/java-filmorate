@@ -43,13 +43,38 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
     private static final String FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY = """
             select f.FILM_ID,
                    count(FUL.USER_ID) as likes
-            from (select *
-                    from (select * 
+            from (select fm.FILM_ID
+                    from (select FILM.FILM_ID
                             from FILM
-                            where EXTRACT(YEAR FROM date(release_date)) = ?
-                            ) as f
-                    join film_genre fg on f.film_id = fg.film_id
+                            where EXTRACT(YEAR FROM CAST(FILM.RELEASE_DATE AS date)) = ?
+                            ) as fm
+                    join film_genre fg on fm.FILM_ID = fg.FILM_ID
                     where fg.genre_id = ?
+                    ) as f
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            group by f.FILM_ID
+            order by likes desc
+            limit ?;
+            """;
+    private static final String FIND_POPULAR_FILM_IDS_BY_YEAR_QUERY = """
+            select f.FILM_ID,
+                   count(FUL.USER_ID) as likes
+            from (select FILM.FILM_ID
+                    from FILM
+                    where EXTRACT(YEAR FROM CAST(FILM.RELEASE_DATE AS date)) = ?
+                    ) as f
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            group by f.FILM_ID
+            order by likes desc
+            limit ?;
+            """;
+    private static final String FIND_POPULAR_FILM_IDS_BY_GENRE_QUERY = """
+            select f.FILM_ID,
+                   count(FUL.USER_ID) as likes
+            from (select fm.FILM_ID
+                    from FILM as fm
+                    join film_genre fg on fm.FILM_ID = fg.FILM_ID
+                    where fg.GENRE_ID = ?
                     ) as f
             left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
             group by f.FILM_ID
@@ -148,9 +173,24 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
     }
 
     @Override
-    public List<Film> findPopularFilmsByGenreAndYear(int count, int genreId, int year) {
+    public List<Film> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
         List<Film> filmsByLikes = new ArrayList<>();
-        SqlRowSet sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY, year, genreId, count);
+        SqlRowSet sqlRowSet;
+
+        if (year != null ) {
+            if (genreId != null) {
+                sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY, year, genreId, count);
+            } else {
+                sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_YEAR_QUERY, year, count);
+            }
+        } else {
+            if (genreId != null) {
+                sqlRowSet = jdbc.queryForRowSet(FIND_POPULAR_FILM_IDS_BY_GENRE_QUERY, genreId, count);
+            } else {
+                return findPopularFilms(count);
+            }
+        }
+
         while (sqlRowSet.next()) {
             long filmId = sqlRowSet.getLong("film_id");
             Film film = findFilmById(filmId).orElseThrow(() -> new NotFoundException("Фильм не найден"));
