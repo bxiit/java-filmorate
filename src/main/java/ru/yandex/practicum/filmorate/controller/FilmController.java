@@ -62,9 +62,14 @@ public class FilmController {
     @GetMapping("/popular")
     @ResponseStatus(OK)
     public List<FilmDto> getPopularFilms(
-            @RequestParam(value = "count", defaultValue = "10") int count
-    ) {
-        return filmService.findPopularFilmsByCount(count);
+            @RequestParam(value = "count", defaultValue = "10") int count,
+            @RequestParam(value = "genreId", required = false) Long genreId,
+            @RequestParam(value = "year", required = false) Integer year) {
+        if (genreId == null && year == null) {
+            return filmService.findPopularFilmsByCount(count);
+        } else {
+            return filmService.findPopularFilmsByGenreAndYear(count, genreId, year);
+        }
     }
 
     @PutMapping("/{id}/like/{userId}")

@@ -40,6 +40,46 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             order by likes desc
             limit ?;
             """;
+    private static final String FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY = """
+            select *,
+            FUL.USER_ID as liked_user_id
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            join (select FUL.FILM_ID, count(FUL.USER_ID) as count
+                  from PUBLIC.FILM_USER_LIKES FUL
+             	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
+            where EXTRACT(YEAR FROM CAST(f.RELEASE_DATE AS date)) = ?
+            and GENRE_ID = ?
+            order by likes.count desc
+            limit ?
+            """;
+    private static final String FIND_POPULAR_FILM_IDS_BY_YEAR_QUERY = """
+            select *,
+            FUL.USER_ID as liked_user_id
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            join (select FUL.FILM_ID, count(FUL.USER_ID) as count
+                  from PUBLIC.FILM_USER_LIKES FUL
+             	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
+            where EXTRACT(YEAR FROM CAST(f.RELEASE_DATE AS date)) = ?
+            order by likes.count desc
+            limit ?
+            """;
+    private static final String FIND_POPULAR_FILM_IDS_BY_GENRE_QUERY = """
+            select *,
+            FUL.USER_ID as liked_user_id
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            join (select FUL.FILM_ID, count(FUL.USER_ID) as count
+                  from PUBLIC.FILM_USER_LIKES FUL
+             	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
+            where GENRE_ID = ?
+            order by likes.count desc
+            limit ?
+            """;
     private static final String FIND_BY_ID_QUERY = """
             select f.*,
                                       FG.GENRE_ID,
@@ -194,6 +234,24 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             filmsByLikes.add(film);
         }
         return filmsByLikes;
+    }
+
+    @Override
+    public List<Film> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
+
+        if (year != null) {
+            if (genreId != null) {
+                return findManyWithExtractor(FIND_POPULAR_FILM_IDS_BY_GENRE_AND_YEAR_QUERY, year, genreId, count);
+            } else {
+                return findManyWithExtractor(FIND_POPULAR_FILM_IDS_BY_YEAR_QUERY, year, count);
+            }
+        } else {
+            if (genreId != null) {
+                 return findManyWithExtractor(FIND_POPULAR_FILM_IDS_BY_GENRE_QUERY, genreId, count);
+            } else {
+                return findPopularFilms(count);
+            }
+        }
     }
 
     @Override

@@ -86,6 +86,14 @@ public class FilmService {
                 .toList();
     }
 
+    public List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
+        return filmStorage.findPopularFilmsByGenreAndYear(count, genreId, year).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
+
     public void likeFilm(long filmId, long userId) {
         likeFilmAction(filmId, userId, true);
     }
