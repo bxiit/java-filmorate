@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.util.DurationDeserializer;
@@ -16,17 +19,12 @@ import ru.yandex.practicum.filmorate.util.annotations.NotBefore;
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 @Data
+@Builder(toBuilder = true)
+@AllArgsConstructor
 public class FilmDto {
-
-    public FilmDto() {
-        this.likedUsersIDs = new HashSet<>();
-        this.genres = new TreeSet<>();
-    }
 
     @Positive(message = "Не валидный идентификатор")
     private Long id;
@@ -51,4 +49,6 @@ public class FilmDto {
     private MpaDto mpa;
 
     private Set<GenreDto> genres;
+
+    private Set<DirectorDto> directors;
 }

@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,14 +12,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import ru.yandex.practicum.filmorate.controller.DirectorController;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.GenreController;
 import ru.yandex.practicum.filmorate.controller.MpaController;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.service.director.DirectorService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.genre.GenreService;
 import ru.yandex.practicum.filmorate.service.mpa.MpaService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.storage.director.DirectorDBStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDBStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.RowMapperConfig;
@@ -33,11 +37,11 @@ import java.util.Objects;
 
 @JdbcTest
 @ContextConfiguration(classes = {
-        UserController.class, FilmController.class,
+        UserController.class, FilmController.class, DirectorController.class,
         MpaController.class, GenreController.class,
-        UserService.class, FilmService.class,
+        UserService.class, FilmService.class, DirectorService.class,
         MpaService.class, GenreService.class,
-        UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class,
+        UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class, DirectorDBStorage.class,
         MpaDBStorage.class, GenreDBStorage.class,
         ResultSetExtractorConfig.class,
         RowMapperConfig.class
@@ -55,7 +59,7 @@ public class FilmorateApplicationTests {
     private JdbcTemplate jdbcTemplate;
 
     @SneakyThrows({SQLException.class, NullPointerException.class})
-    @BeforeEach
+    @AfterEach
     void clearStorage() {
         ClassPathResource schemaResource = new ClassPathResource("schema.sql");
         ClassPathResource dataResource = new ClassPathResource("data.sql");

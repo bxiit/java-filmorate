@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.util.DurationDeserializer;
@@ -20,6 +23,7 @@ import java.util.TreeSet;
  * Film.
  */
 @Data
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class Film {
 
@@ -46,4 +50,6 @@ public class Film {
     private MpaDto mpa;
 
     private Set<GenreDto> genres;
+
+    private Set<DirectorDto> directors;
 }

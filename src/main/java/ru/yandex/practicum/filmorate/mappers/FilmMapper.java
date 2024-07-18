@@ -13,7 +13,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.Set;
 import java.util.TreeSet;
 
-@Mapper(componentModel = "spring")
+@Mapper()
 public interface FilmMapper {
 
     @Named("mapToTreeSet")
@@ -27,9 +27,15 @@ public interface FilmMapper {
     @Mapping(target = "duration", source = "request.duration")
     @Mapping(target = "mpa", source = "request.mpa")
     @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
+    @Mapping(target = "directors", source = "request.directors",
+            defaultExpression = "java(new java.util.HashSet<>())")
     Film mapNewFilmToFilm(FilmDto request);
 
     @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
+    @Mapping(target = "likedUsersIDs", source = "film.likedUsersIDs",
+            defaultExpression = "java(new java.util.HashSet<>())")
+    @Mapping(target = "directors", source = "film.directors",
+            defaultExpression = "java(new java.util.HashSet<>())")
     FilmDto mapToFilmDto(Film film);
 
 
@@ -39,6 +45,7 @@ public interface FilmMapper {
     @Mapping(target = "releaseDate", source = "request.releaseDate", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "duration", source = "request.duration", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "mpa", source = "request.mpa", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "directors", source = "request.directors", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Film updateFilmFields(@MappingTarget Film film, FilmDto request);
 
     FilmMapper MAPPER = Mappers.getMapper(FilmMapper.class);

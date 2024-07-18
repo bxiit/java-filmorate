@@ -25,11 +25,13 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
     private static final String FIND_ALL_QUERY = """
             select f.*,
-                                      FG.GENRE_ID,
-                                      FUL.USER_ID as liked_user_id
-                               from FILM f
-                               left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
-                               left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID;
+            FG.GENRE_ID,
+            FUL.USER_ID as liked_user_id,
+            FD.DIRECTOR_ID
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            left join PUBLIC.FILM_DIRECTOR FD on f.FILM_ID = FD.FILM_ID;
             """;
     private static final String FIND_POPULAR_FILM_IDS_QUERY = """
             select f.FILM_ID,
@@ -42,12 +44,14 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             """;
     private static final String FIND_BY_ID_QUERY = """
             select f.*,
-                                      FG.GENRE_ID,
-                                      FUL.USER_ID as liked_user_id
-                               from FILM f
-                               left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
-                               left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
-                               where f.FILM_ID = ?;
+            FG.GENRE_ID,
+            FUL.USER_ID as liked_user_id,
+            FD.DIRECTOR_ID
+            from FILM f
+            left join PUBLIC.FILM_GENRE FG on f.FILM_ID = FG.FILM_ID
+            left join PUBLIC.FILM_USER_LIKES FUL on f.FILM_ID = FUL.FILM_ID
+            left join PUBLIC.FILM_DIRECTOR FD on f.FILM_ID = FD.FILM_ID
+            where f.FILM_ID = ?;
             """;
     private static final String INSERT_QUERY = """
             INSERT INTO FILM (NAME, DESCRIPTION, RELEASE_DATE, DURATION, MPA_ID)

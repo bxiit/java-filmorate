@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.util.SortBy;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -45,6 +47,14 @@ public class FilmController {
     @ResponseStatus(OK)
     public List<FilmDto> getFilms() {
         return filmService.findAllFilms();
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> getFilmsByDirector(
+            @PathVariable("directorId") Long directorId,
+            @RequestParam(value = "sortBy") String[] sortBy
+    ) {
+        return filmService.findFilmsByDirector(directorId, sortBy);
     }
 
     @PutMapping()
