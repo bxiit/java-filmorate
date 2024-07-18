@@ -22,4 +22,8 @@ public class GenreService {
     public List<Genre> findAllGenres() {
         return this.genreStorage.findAllGenres();
     }
+
+    public boolean isExist(long genreId) {
+        return genreStorage.findGenreById(genreId).isPresent();
+    }
 }

@@ -152,15 +152,17 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
         );
 
         // инсерт жанров которые есть у обновляемого фильма
-        for (GenreDto genreDto : film.getGenres()) {
-            insertFilmGenre(film.getId(), genreDto.getId());
+        if (film.getGenres() != null) {
+            for (GenreDto genreDto : film.getGenres()) {
+                insertFilmGenre(film.getId(), genreDto.getId());
+            }
         }
 
         return film;
     }
 
-    private boolean deleteFilmGenre(long filmId) {
-        return delete(DELETE_FILM_GENRE_QUERY, filmId);
+    private void deleteFilmGenre(long filmId) {
+        delete(DELETE_FILM_GENRE_QUERY, filmId);
     }
 
     @Override

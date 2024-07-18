@@ -9,8 +9,11 @@ import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
+import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.BaseServiceTest;
+import ru.yandex.practicum.filmorate.util.SortBy;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -81,8 +84,38 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
     }
 
     @Test
-    void findFilmsByDirector() {
+    void findFilmsByDirector_shouldReturnInOrderOfYear() {
+        FilmDto filmDtoWithDirector = basicFilmDto.toBuilder()
+                .name("2020 film")
+                .directors(Set.of(
+                        new DirectorDto(2L, null)
+                ))
+                .releaseDate(LocalDate.of(2020, Month.NOVEMBER, 1))
+                .build();
+        filmDtoWithDirector = service.addFilm(filmDtoWithDirector);
 
+        FilmDto filmDtoWithDirector2 = filmDtoWithDirector.toBuilder()
+                .name("2023 film")
+                .directors(Set.of(
+                        new DirectorDto(2L, null)
+                ))
+                .releaseDate(LocalDate.of(2023, Month.NOVEMBER, 1))
+                .build();
+
+        service.addFilm(filmDtoWithDirector2);
+        List<FilmDto> filmsByDirector = service.findFilmsByDirector(2L, "year");
+
+        assertThat(filmsByDirector)
+                .hasSize(2)
+                .extracting(FilmDto::getReleaseDate)
+                .containsExactly(
+                        LocalDate.of(2020, Month.NOVEMBER, 1),
+                        LocalDate.of(2023, Month.NOVEMBER, 1)
+                );
+        assertThat(filmsByDirector)
+                .hasSize(2)
+                .extracting(FilmDto::getName)
+                .containsExactly("2020 film", "2023 film");
     }
 
     @Test
@@ -134,27 +167,6 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
                             .extracting(DirectorDto::getName)
                             .containsExactly("Квентин Тарантино", "Вуди Аллен");
                 });
-    }
-
-    @Test
-    void deleteFilmById() {
-    }
-
-    @Test
-    void findPopularFilmsByCount() {
-    }
-
-    @Test
-    void likeFilm() {
-    }
-
-    @Test
-    void unlikeFilm() {
-    }
-
-    @AfterEach
-    void clearDatabase() {
-
     }
 
     private FilmDto getFilmFromService(Long filmId) {

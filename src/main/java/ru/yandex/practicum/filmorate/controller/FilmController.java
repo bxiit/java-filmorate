@@ -52,7 +52,7 @@ public class FilmController {
     @GetMapping("/director/{directorId}")
     public List<FilmDto> getFilmsByDirector(
             @PathVariable("directorId") Long directorId,
-            @RequestParam(value = "sortBy") String[] sortBy
+            @RequestParam("sortBy") String sortBy
     ) {
         return filmService.findFilmsByDirector(directorId, sortBy);
     }

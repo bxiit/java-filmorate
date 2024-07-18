@@ -12,11 +12,11 @@ drop table if exists USERS;
 
 CREATE TABLE IF NOT EXISTS users
 (
-user_id  BIGINT PRIMARY KEY AUTO_INCREMENT,
-email    TEXT UNIQUE NOT NULL,
-login    TEXT UNIQUE NOT NULL,
-name     TEXT,
-birthday DATE        NOT NULL
+    user_id  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email    TEXT UNIQUE NOT NULL,
+    login    TEXT UNIQUE NOT NULL,
+    name     TEXT,
+    birthday DATE        NOT NULL
 );
 
 CREATE TYPE friends_status AS ENUM ('REQ_USER1', 'REQ_USER2', 'FRIENDS');
@@ -88,9 +88,9 @@ CREATE TABLE IF NOT EXISTS director
 
 CREATE TABLE IF NOT EXISTS film_director
 (
-    film_director_id BIGINT AUTO_INCREMENT ,
-    film_id BIGINT REFERENCES film(film_id),
-    director_id BIGINT REFERENCES director(director_id)
+    film_director_id BIGINT AUTO_INCREMENT,
+    film_id          BIGINT REFERENCES film (film_id),
+    director_id      BIGINT REFERENCES director (director_id)
 );
 
 CREATE TABLE IF NOT EXISTS operation

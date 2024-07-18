@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -12,7 +13,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.controller.DirectorController;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.GenreController;
@@ -32,7 +32,6 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
 import ru.yandex.practicum.filmorate.storage.user.FriendDBStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 
-import java.sql.SQLException;
 import java.util.Objects;
 
 @JdbcTest
@@ -51,24 +50,33 @@ import java.util.Objects;
 @ActiveProfiles("test")
 public class FilmorateApplicationTests {
 
-    @Test
-    void contextLoads() {
-    }
+    public static final String SCHEMA_SQL = "schema.sql";
+    public static final String DATA_SQL = "data.sql";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @SneakyThrows({SQLException.class, NullPointerException.class})
+    @PostConstruct
+    private void postConstruct() throws Exception {
+        Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
+        Objects.requireNonNull(jdbcTemplate.getDataSource().getConnection());
+    }
+
+    @SneakyThrows({ NullPointerException.class})
     @AfterEach
     void clearStorage() {
-        ClassPathResource schemaResource = new ClassPathResource("schema.sql");
-        ClassPathResource dataResource = new ClassPathResource("data.sql");
-        Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
+        var schemaResource = new ClassPathResource(SCHEMA_SQL);
+        var dataResource = new ClassPathResource(DATA_SQL);
 
+        executeScript(schemaResource);
+        executeScript(dataResource);
+    }
+
+    @SneakyThrows
+    private void executeScript(ClassPathResource classPathResource) {
         ScriptUtils.executeSqlScript(
                 jdbcTemplate.getDataSource().getConnection(),
-                schemaResource);
-        ScriptUtils.executeSqlScript(jdbcTemplate.getDataSource().getConnection(),
-                dataResource);
+                classPathResource
+        );
     }
 }

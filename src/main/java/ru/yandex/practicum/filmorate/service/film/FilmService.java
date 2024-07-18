@@ -44,6 +44,7 @@ public class FilmService {
     private final DirectorService directorService;
 
     public FilmDto addFilm(FilmDto request) {
+        convertDuration(request);
         setGenreName(request);
         setMpaName(request);
         setDirectorName(request);
@@ -51,6 +52,10 @@ public class FilmService {
         film = filmStorage.addFilm(film);
         addDirectorForFilm(film);
         return FilmMapper.MAPPER.mapToFilmDto(film);
+    }
+
+    private void convertDuration(FilmDto request) {
+        request.setDuration(request.getDuration().multipliedBy(60));
     }
 
     private void addDirectorForFilm(Film film) {
@@ -76,21 +81,12 @@ public class FilmService {
         return filmDto;
     }
 
-    public List<FilmDto> findFilmsByDirector(Long directorId, String[] sorts) {
-        SortBy sort = SortBy.from(sorts[0]);
-        List<FilmDto> filmDtos = directorService.findFilmIdsByDirectorId(directorId).stream()
+    public List<FilmDto> findFilmsByDirector(Long directorId, String sort) {
+        SortBy sortBy = SortBy.valueOf(sort.toUpperCase());
+        return directorService.findFilmIdsByDirectorId(directorId).stream()
                 .map(this::findFilmById)
+                .sorted(sortBy.sortComparator())
                 .toList();
-        if (Objects.equals(sort, SortBy.YEAR)) {
-            filmDtos = filmDtos.stream()
-                    .sorted(Comparator.comparing(FilmDto::getReleaseDate))
-                    .toList();
-        } else if (Objects.equals(sort, SortBy.LIKES)) {
-            filmDtos = filmDtos.stream()
-                    .sorted(Comparator.comparingInt(f -> f.getLikedUsersIDs().size()))
-                    .toList();
-        }
-        return filmDtos;
     }
 
     public List<FilmDto> findAllFilms() {
@@ -103,6 +99,7 @@ public class FilmService {
     }
 
     public FilmDto updateFilm(FilmDto request) {
+        convertDuration(request);
         Film film = filmStorage.findFilmById(request.getId())
                 .map(f -> FilmMapper.MAPPER.updateFilmFields(f, request))
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
@@ -162,6 +159,9 @@ public class FilmService {
 
     private FilmDto setMpaName(FilmDto filmDto) {
         if (filmDto.getMpa() != null && filmDto.getMpa().getId() != null) {
+            if (!mpaService.isExist(filmDto.getMpa().getId())) {
+                throw new ValidationException("Не существующий рейтинг");
+            }
             Mpa mpa = mpaService.findMpaById(filmDto.getMpa().getId());
             filmDto.getMpa().setName(mpa.getName());
         }
@@ -174,6 +174,9 @@ public class FilmService {
         }
         filmDto.getGenres()
                 .forEach(genreDto -> {
+                    if (!genreService.isExist(genreDto.getId())) {
+                        throw new ValidationException("Не существующий жанр");
+                    }
                     Genre genre = genreService.findGenreById(genreDto.getId());
                     genreDto.setName(genre.getName());
                 });
@@ -191,44 +194,4 @@ public class FilmService {
         filmDto.setDirectors(directorsWithName);
         return filmDto;
     }
-//
-//    private void checkGenreExistence(Set<GenreDto> genres) {
-//        if (genres == null) {
-//            return;
-//        }
-//        for (GenreDto genreDto : genres) {
-//            if (!doesGenreExist(genreDto.getId())) {
-//                throw new ValidationException("Не существующий жанр");
-//            }
-//        }
-//    }
-//
-//    private void checkDirectorExistence(Set<DirectorDto> directors) {
-//        if (directors == null) {
-//            return;
-//        }
-//        for (DirectorDto directorDto : directors) {
-//            if (!doesDirectorExist(directorDto.getId())) {
-//                throw new ValidationException("Не существующий жанр");
-//            }
-//        }
-//    }
-//
-//    private void checkMpaExistence(MpaDto mpaDto) {
-//        if (mpaDto != null && !doesMpaExist(mpaDto.getId())) {
-//            throw new ValidationException("Не существующий рейтинг");
-//        }
-//    }
-//
-//    private boolean doesMpaExist(long mpaId) {
-//        return mpaService.findMpaById(mpaId) != null;
-//    }
-//
-//    private boolean doesGenreExist(long genreId) {
-//        return genreService.findGenreById(genreId) != null;
-//    }
-//
-//    private boolean doesDirectorExist(long directorId) {
-//        return directorService.findDirectorById(directorId) != null;
-//    }
 }

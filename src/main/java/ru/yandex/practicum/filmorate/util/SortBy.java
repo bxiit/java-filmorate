@@ -1,14 +1,25 @@
 package ru.yandex.practicum.filmorate.util;
 
-public enum SortBy {
-    YEAR,
-    LIKES;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 
-    public static SortBy from(String sortBy) {
-        return switch (sortBy.toLowerCase()) {
-            case "year" -> YEAR;
-            case "likes", "like" -> LIKES;
-            default -> null;
-        };
-    }
+import java.util.Comparator;
+
+public enum SortBy implements SortParameter<FilmDto> {
+    YEAR {
+        @Override
+        public Comparator<FilmDto> sortComparator() {
+            return Comparator.comparing(FilmDto::getReleaseDate);
+        }
+    },
+
+    LIKES {
+        @Override
+        public Comparator<FilmDto> sortComparator() {
+            return Comparator.comparing((filmDto) -> filmDto.getLikedUsersIDs().size(), Comparator.reverseOrder());
+        }
+    };
+}
+
+interface SortParameter<T> {
+    Comparator<T> sortComparator();
 }
