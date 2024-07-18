@@ -23,4 +23,6 @@ public interface FilmStorage {
     boolean unlikeFilm(long filmId, long userId);
 
     List<Film> getFilmRecommendations(long userId);
+
+    List<Film> getCommonFilmsIdsWithAnotherUser(long userId, long friendId);
 }

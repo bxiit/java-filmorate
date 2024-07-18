@@ -150,4 +150,12 @@ public class FilmService {
                 .map(this::setMpaName)
                 .toList();
     }
+
+    public List<FilmDto> commonFilmsWithFriend(long userId, long friendId) {
+        return filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
 }

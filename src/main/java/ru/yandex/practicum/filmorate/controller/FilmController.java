@@ -78,4 +78,11 @@ public class FilmController {
     public void unlikeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
         filmService.unlikeFilm(filmId, userId);
     }
+
+    @GetMapping("/common")
+    @ResponseStatus(OK)
+    public List<FilmDto> commonFilmsWithFriend(@RequestParam(value = "userId") long userId,
+                                                @RequestParam(value = "friendId") long friendId) {
+        return filmService.commonFilmsWithFriend(userId, friendId);
+    }
 }
