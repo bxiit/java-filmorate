@@ -142,4 +142,12 @@ public class FilmService {
     private boolean doesGenreExist(long genreId) {
         return genreStorage.findGenreById(genreId).isPresent();
     }
+
+    public List<FilmDto> getFilmRecommendations(long userId) {
+        return filmStorage.getFilmRecommendations(userId).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
 }

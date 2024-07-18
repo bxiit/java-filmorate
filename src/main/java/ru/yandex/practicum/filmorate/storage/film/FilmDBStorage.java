@@ -78,6 +78,40 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             DELETE FROM FILM_USER_LIKES
             WHERE (FILM_ID = ? AND USER_ID = ?);
             """;
+    private static final String FIND_RECOMMENDED_FILMS = """
+            SELECT REC_FILMS.FILM_ID AS film_id,
+                   F.NAME AS name,
+                   F.DESCRIPTION AS description,
+                   F.RELEASE_DATE AS release_date,
+                   F.DURATION AS duration,
+                   F.MPA_ID AS mpa_id,
+                   FG.GENRE_ID AS genre_id,
+                   FUL.USER_ID as liked_user_id
+            FROM (
+                SELECT FILM_ID
+                FROM FILM_USER_LIKES
+                WHERE FILM_ID IN (
+                    SELECT FILM_ID
+                    FROM FILM_USER_LIKES
+                    WHERE USER_ID = (
+                        SELECT USER_ID
+                        FROM FILM_USER_LIKES
+                        WHERE FILM_ID IN (
+                              SELECT FILM_ID
+                              FROM FILM_USER_LIKES
+                              WHERE USER_ID = ?)
+                        AND USER_ID != ?
+                        GROUP BY USER_ID
+                        ORDER BY COUNT(FILM_ID) DESC
+                        LIMIT 1))
+                AND FILM_ID NOT IN (
+                    SELECT USER_FILMS.FILM_ID
+                    FROM FILM_USER_LIKES AS USER_FILMS
+                    WHERE USER_FILMS.USER_ID = ?)) AS REC_FILMS
+            LEFT JOIN FILM AS F ON REC_FILMS.FILM_ID = F.FILM_ID
+            LEFT JOIN FILM_GENRE FG on REC_FILMS.FILM_ID = FG.FILM_ID
+            LEFT JOIN FILM_USER_LIKES FUL on REC_FILMS.FILM_ID = FUL.FILM_ID;
+            """;
 
     public FilmDBStorage(JdbcTemplate jdbc, RowMapper<Film> rowMapper, ResultSetExtractor<List<Film>> extractor) {
         super(jdbc, rowMapper, extractor);
@@ -172,5 +206,10 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
     @Override
     public boolean unlikeFilm(long filmId, long userId) {
         return delete(UNLIKE_FILM, filmId, userId);
+    }
+
+    @Override
+    public List<Film> getFilmRecommendations(long userId) {
+        return findManyWithExtractor(FIND_RECOMMENDED_FILMS, userId, userId, userId);
     }
 }
