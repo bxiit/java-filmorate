@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.util.List;
 
@@ -30,5 +27,10 @@ public class ResultSetExtractorConfig {
     @Bean
     public ResultSetExtractor<List<Genre>> genreResultSetExtractor() {
         return new GenreExtractor();
+    }
+
+    @Bean
+    public ResultSetExtractor<List<Review>> reviewResultSetExtractor() {
+        return new ReviewExtractor();
     }
 }

@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.storage.mappers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.RowMapper;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 
 @Configuration
 public class RowMapperConfig {
@@ -28,5 +25,10 @@ public class RowMapperConfig {
     @Bean
     public RowMapper<Genre> genreRowMapper() {
         return new GenreRowMapper();
+    }
+
+    @Bean
+    public RowMapper<Review> reviewRowMapper() {
+        return new ReviewRowMapper();
     }
 }
