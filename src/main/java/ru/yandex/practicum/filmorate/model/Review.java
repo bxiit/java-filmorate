@@ -17,9 +17,9 @@ public class Review {
 	}
 
 	private Long reviewId;
-	@NotEmpty
+	@NotNull
 	private Long userId;
-	@NotEmpty
+	@NotNull
 	private Long filmId;
 	private String content;
 	@JsonProperty(value = "isPositive")

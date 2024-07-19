@@ -31,10 +31,10 @@ public class ReviewService {
 	}
 
 	public Review addReview(Review review) {
-		if (userStorage.findUserById(review.getUserId()).isEmpty() && review.getUserId() != null) {
+		if (review.getUserId() != null && userStorage.findUserById(review.getUserId()).isEmpty()) {
 			throw new NotFoundException("Пользователь не найден");
 		}
-		if (filmStorage.findFilmById(review.getFilmId()).isEmpty() && review.getFilmId() != null) {
+		if (review.getFilmId() != null && filmStorage.findFilmById(review.getFilmId()).isEmpty()) {
 			throw new NotFoundException("Фильм не найден");
 		}
 			return reviewStorage.addReview(review);
@@ -66,7 +66,7 @@ public class ReviewService {
 		if (review.isEmpty()) {
 			throw new NotFoundException("Отзыв не найден");
 		}
-		return reviewStorage.getReviewById(reviewId);
+		return review;
 	}
 
 	public void likeReview(long reviewId, long userId) {
