@@ -18,9 +18,13 @@ public interface FilmStorage {
 
     List<Film> findPopularFilms(long count);
 
+    List<Film> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year);
+
     boolean likeFilm(long filmId, long userId);
 
     boolean unlikeFilm(long filmId, long userId);
 
     List<Film> getFilmRecommendations(long userId);
+
+    List<Film> getCommonFilmsIdsWithAnotherUser(long userId, long friendId);
 }

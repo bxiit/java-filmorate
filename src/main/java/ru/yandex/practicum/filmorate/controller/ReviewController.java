@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.review.ReviewService;
@@ -17,8 +16,6 @@ import java.util.Optional;
 public class ReviewController {
 
 	private final ReviewService reviewService;
-
-
 
 	@PostMapping
 	public Review addReview(@RequestBody Review review) {
@@ -70,5 +67,4 @@ public class ReviewController {
 		reviewService.removeDislike(reviewId, userId);
 
 	}
-
 }
