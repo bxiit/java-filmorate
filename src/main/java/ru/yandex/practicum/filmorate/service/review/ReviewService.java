@@ -6,11 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.FilmDBStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.review.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
@@ -25,8 +22,8 @@ public class ReviewService {
 
 
 	@Autowired
-	public ReviewService(@Qualifier("ReviewDbStorage") ReviewStorage reviewStorage, @Qualifier("UserDBStorage") UserDBStorage userStorage,
-						 @Qualifier("FilmDBStorage") FilmDBStorage filmStorage) {
+	public ReviewService(@Qualifier("ReviewDbStorage") ReviewStorage reviewStorage, @Qualifier("UserDBStorage") UserStorage userStorage,
+						 @Qualifier("FilmDBStorage") FilmStorage filmStorage) {
 		this.reviewStorage = reviewStorage;
 		this.userStorage = userStorage;
 		this.filmStorage = filmStorage;
@@ -34,7 +31,7 @@ public class ReviewService {
 	}
 
 	public Review addReview(Review review) {
-		if (userStorage.findUserById(review.getUserId()).isEmpty() && review.getUserId() != null ) {
+		if (userStorage.findUserById(review.getUserId()).isEmpty() && review.getUserId() != null) {
 			throw new NotFoundException("Пользователь не найден");
 		}
 		if (filmStorage.findFilmById(review.getFilmId()).isEmpty() && review.getFilmId() != null) {
@@ -149,5 +146,4 @@ public class ReviewService {
 			}
 		}
 	}
-
 }
