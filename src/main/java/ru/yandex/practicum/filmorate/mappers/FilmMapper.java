@@ -3,35 +3,28 @@ package ru.yandex.practicum.filmorate.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
-import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.model.Film;
-
-import java.util.Set;
-import java.util.TreeSet;
 
 @Mapper()
 public interface FilmMapper {
-
-    @Named("mapToTreeSet")
-    default TreeSet<GenreDto> mapToTreeSet(Set<GenreDto> genres) {
-        return genres != null ? new TreeSet<>(genres) : new TreeSet<>();
-    }
 
     @Mapping(target = "name", source = "request.name")
     @Mapping(target = "description", source = "request.description")
     @Mapping(target = "releaseDate", source = "request.releaseDate")
     @Mapping(target = "duration", source = "request.duration")
     @Mapping(target = "mpa", source = "request.mpa")
-    @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
+    @Mapping(target = "genres", source = "request.genres",
+            defaultExpression = "java(new java.util.TreeSet<>())"
+    )
     @Mapping(target = "directors", source = "request.directors",
             defaultExpression = "java(new java.util.HashSet<>())")
     Film mapNewFilmToFilm(FilmDto request);
 
-    @Mapping(target = "genres", qualifiedByName = "mapToTreeSet")
+    @Mapping(target = "genres", source = "film.genres",
+            defaultExpression = "java(new java.util.TreeSet<>())")
     @Mapping(target = "likedUsersIDs", source = "film.likedUsersIDs",
             defaultExpression = "java(new java.util.HashSet<>())")
     @Mapping(target = "directors", source = "film.directors",
@@ -40,12 +33,18 @@ public interface FilmMapper {
 
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "name", source = "request.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "description", source = "request.description", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "releaseDate", source = "request.releaseDate", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "duration", source = "request.duration", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "mpa", source = "request.mpa", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "directors", source = "request.directors", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "name", source = "request.name",
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "description", source = "request.description",
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "releaseDate", source = "request.releaseDate",
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "duration", source = "request.duration",
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "mpa", source = "request.mpa",
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "directors", source = "request.directors",
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Film updateFilmFields(@MappingTarget Film film, FilmDto request);
 
     FilmMapper MAPPER = Mappers.getMapper(FilmMapper.class);

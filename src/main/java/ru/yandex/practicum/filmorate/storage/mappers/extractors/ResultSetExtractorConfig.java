@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -31,6 +32,11 @@ public class ResultSetExtractorConfig {
     @Bean
     public ResultSetExtractor<List<Genre>> genreResultSetExtractor() {
         return new GenreExtractor();
+    }
+
+    @Bean
+    public ResultSetExtractor<List<Review>> reviewResultSetExtractor() {
+        return new ReviewExtractor();
     }
 
     @Bean

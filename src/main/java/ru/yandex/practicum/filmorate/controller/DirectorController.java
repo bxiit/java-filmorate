@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +30,7 @@ public class DirectorController {
     public DirectorDto createDirector(@RequestBody DirectorDto directorDto) {
         return directorService.addDirector(directorDto);
     }
+
     @GetMapping()
     @ResponseStatus(OK)
     public List<DirectorDto> getAllDirectors() {

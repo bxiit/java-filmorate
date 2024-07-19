@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 
 @Configuration
@@ -29,6 +30,11 @@ public class RowMapperConfig {
     @Bean
     public RowMapper<Genre> genreRowMapper() {
         return new GenreRowMapper();
+    }
+
+    @Bean
+    public RowMapper<Review> reviewRowMapper() {
+        return new ReviewRowMapper();
     }
 
     @Bean

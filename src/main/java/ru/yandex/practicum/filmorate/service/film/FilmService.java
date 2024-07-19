@@ -12,16 +12,11 @@ import ru.yandex.practicum.filmorate.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.director.DirectorService;
-import ru.yandex.practicum.filmorate.service.genre.GenreService;
-import ru.yandex.practicum.filmorate.service.mpa.MpaService;
-import ru.yandex.practicum.filmorate.storage.director.DirectorDBStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
-import ru.yandex.practicum.filmorate.util.SortBy;
+import ru.yandex.practicum.filmorate.util.sort.SortBy;
 
 import java.util.List;
 import java.util.Set;
@@ -35,20 +30,13 @@ public class FilmService {
     @Qualifier("FilmDBStorage")
     private final FilmStorage filmStorage;
 
-    private final MpaService mpaService;
-
-    private final MpaDBStorage mpaStorage;g
-
-    private final GenreService genreService;
+    private final MpaDBStorage mpaStorage;
 
     private final GenreDBStorage genreStorage;
 
     private final DirectorService directorService;
 
-    private final DirectorDBStorage directorStorage;
-
     public FilmDto addFilm(FilmDto request) {
-        convertDuration(request);
         setGenreName(request);
         setMpaName(request);
         setDirectorName(request);
@@ -86,7 +74,6 @@ public class FilmService {
     }
 
     public FilmDto updateFilm(FilmDto request) {
-        convertDuration(request);
         Film film = filmStorage.findFilmById(request.getId())
                 .map(f -> FilmMapper.MAPPER.updateFilmFields(f, request))
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
@@ -100,8 +87,6 @@ public class FilmService {
         return updatedFilmDto;
     }
 
-
-    // удаляет все связки режиссера с фильмом и добавляет заново
     public void deleteFilmById(long filmId) {
         boolean deleted = filmStorage.deleteFilmById(filmId);
         if (!deleted) {
@@ -115,6 +100,14 @@ public class FilmService {
                 .map(this::setGenreName)
                 .map(this::setMpaName)
                 .map(this::setDirectorName)
+                .toList();
+    }
+
+    public List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
+        return filmStorage.findPopularFilmsByGenreAndYear(count, genreId, year).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
                 .toList();
     }
 
@@ -140,13 +133,16 @@ public class FilmService {
     }
 
     private FilmDto setMpaName(FilmDto filmDto) {
-        if (filmDto.getMpa() != null && filmDto.getMpa().getId() != null) {
-            if (!mpaService.isExist(filmDto.getMpa().getId())) {
-                throw new ValidationException("Не существующий рейтинг");
-            }
-            Mpa mpa = mpaService.findMpaById(filmDto.getMpa().getId());
-            filmDto.getMpa().setName(mpa.getName());
+        if (filmDto.getMpa() == null || filmDto.getMpa().getId() == null) {
+            return filmDto;
         }
+        mpaStorage.findMpaById(filmDto.getMpa().getId())
+                .ifPresentOrElse(
+                        mpa -> filmDto.getMpa().setName(mpa.getName()),
+                        () -> {
+                            throw new ValidationException("Не валидный рейтинг");
+                        }
+                );
         return filmDto;
     }
 
@@ -155,13 +151,13 @@ public class FilmService {
             return filmDto;
         }
         filmDto.getGenres()
-                .forEach(genreDto -> {
-                    if (!genreService.isExist(genreDto.getId())) {
-                        throw new ValidationException("Не существующий жанр");
-                    }
-                    Genre genre = genreService.findGenreById(genreDto.getId());
-                    genreDto.setName(genre.getName());
-                });
+                .forEach(genreDto -> genreStorage.findGenreById(genreDto.getId())
+                        .ifPresentOrElse(
+                                genre -> genreDto.setName(genre.getName()),
+                                () -> {
+                                    throw new ValidationException("Не валидный жанр");
+                                }
+                        ));
         return filmDto;
     }
 
@@ -177,10 +173,6 @@ public class FilmService {
         return filmDto;
     }
 
-    private void convertDuration(FilmDto request) {
-        request.setDuration(request.getDuration().multipliedBy(60));
-    }
-
     private void updateDirectorOfFilm(FilmDto filmDto) {
         if (filmDto.getDirectors() == null) {
             return;
@@ -190,5 +182,21 @@ public class FilmService {
             Director director = DirectorMapper.MAPPER.mapToModel(directorDto);
             directorService.addDirectorForFilm(filmDto.getId(), director);
         }
+    }
+
+    public List<FilmDto> getFilmRecommendations(long userId) {
+        return filmStorage.getFilmRecommendations(userId).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
+
+    public List<FilmDto> commonFilmsWithFriend(long userId, long friendId) {
+        return filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
     }
 }

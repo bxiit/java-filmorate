@@ -8,14 +8,13 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -94,5 +93,17 @@ public class BaseRepository<T> {
                 throw new ConflictException(message);
             }
         }
+    }
+
+    protected void noPkInsert(String query, Object... params) {
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection
+                    .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            for (int idx = 0; idx < params.length; idx++) {
+                ps.setObject(idx + 1, params[idx]);
+            }
+            return ps;
+        }, keyHolder);
     }
 }
