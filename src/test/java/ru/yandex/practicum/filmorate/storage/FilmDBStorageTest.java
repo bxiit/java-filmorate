@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -59,13 +58,13 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
                 .isPresent()
                 .hasValueSatisfying(
                         f -> assertThat(f).hasFieldOrPropertyWithValue("name", "Социальная сеть")
-                        .hasFieldOrPropertyWithValue(
-                                "description", "Один из лучших фильмов"
-                        )
-                        .hasFieldOrPropertyWithValue(
-                                "releaseDate", LocalDate.of(2010, Month.OCTOBER, 28)
-                        )
-                        .hasFieldOrPropertyWithValue("duration", Duration.ofMinutes(120))
+                                .hasFieldOrPropertyWithValue(
+                                        "description", "Один из лучших фильмов"
+                                )
+                                .hasFieldOrPropertyWithValue(
+                                        "releaseDate", LocalDate.of(2010, Month.OCTOBER, 28)
+                                )
+                                .hasFieldOrPropertyWithValue("duration", Duration.ofMinutes(120))
                 );
     }
 

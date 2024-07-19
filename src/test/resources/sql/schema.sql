@@ -1,4 +1,5 @@
-DROP ALL OBJECTS;
+DROP
+ALL OBJECTS;
 drop table if exists FILM_GENRE;
 drop table if exists FILM_USER_LIKES;
 drop table if exists film_director;

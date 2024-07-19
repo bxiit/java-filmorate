@@ -11,8 +11,11 @@ import ru.yandex.practicum.filmorate.model.Director;
 @Mapper
 public interface DirectorMapper {
     DirectorMapper MAPPER = Mappers.getMapper(DirectorMapper.class);
+
     Director mapToModel(DirectorDto directorDto);
+
     DirectorDto mapToDto(Director director);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "request.name",
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

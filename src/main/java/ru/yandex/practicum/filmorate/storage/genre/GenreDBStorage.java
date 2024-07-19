@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class GenreDBStorage extends BaseRepository<Genre> {
+public class GenreDBStorage extends BaseRepository<Genre> implements GenreStorage {
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM GENRE ORDER BY GENRE_ID";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM GENRE WHERE GENRE_ID = ? ORDER BY GENRE_ID";
@@ -20,10 +20,12 @@ public class GenreDBStorage extends BaseRepository<Genre> {
         super(jdbc, rowMapper, extractor);
     }
 
+    @Override
     public Optional<Genre> findGenreById(long genreId) {
         return findOne(FIND_BY_ID_QUERY, genreId);
     }
 
+    @Override
     public List<Genre> findAllGenres() {
         return findMany(FIND_ALL_QUERY);
     }

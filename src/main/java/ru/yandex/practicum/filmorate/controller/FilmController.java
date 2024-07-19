@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.util.SortBy;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
@@ -72,9 +70,14 @@ public class FilmController {
     @GetMapping("/popular")
     @ResponseStatus(OK)
     public List<FilmDto> getPopularFilms(
-            @RequestParam(value = "count", defaultValue = "10") int count
-    ) {
-        return filmService.findPopularFilmsByCount(count);
+            @RequestParam(value = "count", defaultValue = "10") int count,
+            @RequestParam(value = "genreId", required = false) Long genreId,
+            @RequestParam(value = "year", required = false) Integer year) {
+        if (genreId == null && year == null) {
+            return filmService.findPopularFilmsByCount(count);
+        } else {
+            return filmService.findPopularFilmsByGenreAndYear(count, genreId, year);
+        }
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -87,5 +90,12 @@ public class FilmController {
     @ResponseStatus(OK)
     public void unlikeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
         filmService.unlikeFilm(filmId, userId);
+    }
+
+    @GetMapping("/common")
+    @ResponseStatus(OK)
+    public List<FilmDto> commonFilmsWithFriend(@RequestParam(value = "userId") long userId,
+                                               @RequestParam(value = "friendId") long friendId) {
+        return filmService.commonFilmsWithFriend(userId, friendId);
     }
 }
