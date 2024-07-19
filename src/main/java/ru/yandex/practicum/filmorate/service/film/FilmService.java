@@ -86,6 +86,14 @@ public class FilmService {
                 .toList();
     }
 
+    public List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
+        return filmStorage.findPopularFilmsByGenreAndYear(count, genreId, year).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
+
     public void likeFilm(long filmId, long userId) {
         likeFilmAction(filmId, userId, true);
     }
@@ -145,6 +153,14 @@ public class FilmService {
 
     public List<FilmDto> getFilmRecommendations(long userId) {
         return filmStorage.getFilmRecommendations(userId).stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
+                .map(this::setGenreName)
+                .map(this::setMpaName)
+                .toList();
+    }
+
+    public List<FilmDto> commonFilmsWithFriend(long userId, long friendId) {
+        return filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId).stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .map(this::setGenreName)
                 .map(this::setMpaName)

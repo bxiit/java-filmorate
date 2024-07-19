@@ -119,5 +119,4 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 	public void subtractUsefulCount(long reviewId) {
 		update(SUBTRACT_USEFUL_QUERY, reviewId);
 	}
-
 }

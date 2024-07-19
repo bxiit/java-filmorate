@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.util.IdGenerator;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,28 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
+        List<Film> films = this.films.values().stream().toList();
+
+        if (year != null) {
+            films = films.stream()
+                    .filter(film -> film.getReleaseDate().getYear() == year)
+                    .toList();
+        }
+        if (genreId != null) {
+            films = films.stream()
+                    .filter(film -> film.getGenres().stream()
+                            .anyMatch(genreDto -> genreDto.getId().equals(genreId))
+                    )
+                    .toList();
+        }
+
+        return films.stream()
+                .sorted(Comparator.comparingInt(film -> film.getLikedUsersIDs().size()))
+                .toList().reversed();
+    }
+
+    @Override
     public boolean likeFilm(long filmId, long userId) {
         return false;
     }
@@ -65,6 +88,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmRecommendations(long userId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getCommonFilmsIdsWithAnotherUser(long userId, long friendId) {
         return null;
     }
 }
