@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmServiceFacade;
 
 import java.util.List;
 
@@ -27,36 +27,36 @@ import static org.springframework.http.HttpStatus.OK;
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmService filmService;
+    private final FilmServiceFacade filmServiceFacade;
 
     @PostMapping()
     @ResponseStatus(CREATED)
     public FilmDto addFilm(@Valid @RequestBody FilmDto film) {
-        return filmService.addFilm(film);
+        return filmServiceFacade.addFilm(film);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(OK)
     public FilmDto getFilmById(@PathVariable("id") long id) {
-        return filmService.findFilmById(id);
+        return filmServiceFacade.findFilmById(id);
     }
 
     @GetMapping()
     @ResponseStatus(OK)
     public List<FilmDto> getFilms() {
-        return filmService.findAllFilms();
+        return filmServiceFacade.findAllFilms();
     }
 
     @PutMapping()
     @ResponseStatus(OK)
     public FilmDto updateFilm(@Valid @RequestBody FilmDto request) {
-        return filmService.updateFilm(request);
+        return filmServiceFacade.updateFilm(request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     public void deleteFilmById(@PathVariable("id") long filmId) {
-        filmService.deleteFilmById(filmId);
+        filmServiceFacade.deleteFilmById(filmId);
     }
 
     @GetMapping("/popular")
@@ -64,30 +64,31 @@ public class FilmController {
     public List<FilmDto> getPopularFilms(
             @RequestParam(value = "count", defaultValue = "10") int count,
             @RequestParam(value = "genreId", required = false) Long genreId,
-            @RequestParam(value = "year", required = false) Integer year) {
+            @RequestParam(value = "year", required = false) Integer year
+    ) {
         if (genreId == null && year == null) {
-            return filmService.findPopularFilmsByCount(count);
+            return filmServiceFacade.findPopularFilmsByCount(count);
         } else {
-            return filmService.findPopularFilmsByGenreAndYear(count, genreId, year);
+            return filmServiceFacade.findPopularFilmsByGenreAndYear(count, genreId, year);
         }
     }
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(OK)
     public void likeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
-        filmService.likeFilm(filmId, userId);
+        filmServiceFacade.likeFilm(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(OK)
     public void unlikeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
-        filmService.unlikeFilm(filmId, userId);
+        filmServiceFacade.unlikeFilm(filmId, userId);
     }
 
     @GetMapping("/common")
     @ResponseStatus(OK)
     public List<FilmDto> commonFilmsWithFriend(@RequestParam(value = "userId") long userId,
                                                 @RequestParam(value = "friendId") long friendId) {
-        return filmService.commonFilmsWithFriend(userId, friendId);
+        return filmServiceFacade.commonFilmsWithFriend(userId, friendId);
     }
 }
