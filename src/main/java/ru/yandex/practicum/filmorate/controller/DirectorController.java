@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class DirectorController {
 
     @PostMapping()
     @ResponseStatus(CREATED)
-    public DirectorDto createDirector(@RequestBody DirectorDto directorDto) {
+    public DirectorDto addDirector(@Valid @RequestBody DirectorDto directorDto) {
         return directorService.addDirector(directorDto);
     }
 

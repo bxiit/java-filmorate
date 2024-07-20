@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
+@Deprecated(since = "db is learned")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -70,6 +71,16 @@ public class InMemoryFilmStorage implements FilmStorage {
         return films.stream()
                 .sorted(Comparator.comparingInt(film -> film.getLikedUsersIDs().size()))
                 .toList().reversed();
+    }
+
+    @Override
+    public List<Film> findFilmsByQueryFilmTitle(String search) {
+        return List.of();
+    }
+
+    @Override
+    public List<Film> findFilmsByQueryDirectorName(String search) {
+        return List.of();
     }
 
     @Override

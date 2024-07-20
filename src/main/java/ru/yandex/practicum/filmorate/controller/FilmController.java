@@ -55,6 +55,14 @@ public class FilmController {
         return filmService.findFilmsByDirector(directorId, sortBy);
     }
 
+    @GetMapping("/search")
+    public List<FilmDto> getFilmsByQuery(
+            @RequestParam("query") String search,
+            @RequestParam("by") String by
+    ) {
+        return filmService.findFilmsByQuery(search, by);
+    }
+
     @PutMapping()
     @ResponseStatus(OK)
     public FilmDto updateFilm(@Valid @RequestBody FilmDto request) {
@@ -75,6 +83,7 @@ public class FilmController {
             @RequestParam(value = "year", required = false) Integer year) {
         if (genreId == null && year == null) {
             return filmService.findPopularFilmsByCount(count);
+            // TODO gandon
         } else {
             return filmService.findPopularFilmsByGenreAndYear(count, genreId, year);
         }
