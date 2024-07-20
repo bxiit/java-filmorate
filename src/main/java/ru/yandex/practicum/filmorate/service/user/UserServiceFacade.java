@@ -41,12 +41,12 @@ public class UserServiceFacade {
     // USER'S FRIENDS
     public void addUsersFriend(long userId, long friendId) {
         userService.addUsersFriend(userId, friendId);
-        eventService.createEvent(userId, friendId, EventType.FRIEND, Operation.ADD);
+        eventService.addEvent(userId, friendId, EventType.FRIEND, Operation.ADD);
     }
 
     public void deleteUsersFriend(long userId, long friendId) {
         userService.deleteUsersFriend(userId, friendId);
-        eventService.createEvent(userId, friendId, EventType.FRIEND, Operation.REMOVE);
+        eventService.addEvent(userId, friendId, EventType.FRIEND, Operation.REMOVE);
     }
 
     public List<UserDto> findUsersFriends(long userId) {
