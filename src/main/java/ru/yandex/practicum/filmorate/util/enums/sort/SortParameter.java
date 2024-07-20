@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.util.sort;
+package ru.yandex.practicum.filmorate.util.enums.sort;
 
 import java.util.Comparator;
 

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.util.sort;
+package ru.yandex.practicum.filmorate.util.enums.sort;
 
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 

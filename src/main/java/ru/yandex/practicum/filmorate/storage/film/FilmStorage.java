@@ -20,6 +20,10 @@ public interface FilmStorage {
 
     List<Film> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year);
 
+    List<Film> findFilmsByQueryFilmTitle(String search);
+
+    List<Film> findFilmsByQueryDirectorName(String search);
+
     boolean likeFilm(long filmId, long userId);
 
     boolean unlikeFilm(long filmId, long userId);

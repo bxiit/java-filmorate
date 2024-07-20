@@ -188,6 +188,31 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             LEFT JOIN FILM_USER_LIKES FUL on SORTED_COMMON_FILMS.FILM_ID = FUL.FILM_ID;
             """;
 
+    private static final String FIND_FILMS_BY_FILM_TITLE_QUERY = """
+            SELECT F.*,
+            FG.GENRE_ID,
+            FUL.USER_ID as liked_user_id,
+            FD.DIRECTOR_ID
+            FROM FILM F
+            LEFT JOIN PUBLIC.FILM_GENRE FG ON F.FILM_ID = FG.FILM_ID
+            LEFT JOIN PUBLIC.FILM_USER_LIKES FUL ON F.FILM_ID = FUL.FILM_ID
+            LEFT JOIN PUBLIC.FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID
+            WHERE F.NAME ILIKE ?
+            """;
+
+    private static final String FIND_FILMS_BY_DIRECTOR_NAME_QUERY = """
+            SELECT F.*,
+            FG.GENRE_ID,
+            FUL.USER_ID as liked_user_id,
+            FD.DIRECTOR_ID
+            FROM FILM F
+            LEFT JOIN PUBLIC.FILM_GENRE FG ON F.FILM_ID = FG.FILM_ID
+            LEFT JOIN PUBLIC.FILM_USER_LIKES FUL ON F.FILM_ID = FUL.FILM_ID
+            LEFT JOIN PUBLIC.FILM_DIRECTOR FD ON F.FILM_ID = FD.FILM_ID
+            LEFT JOIN PUBLIC.DIRECTOR D ON FD.DIRECTOR_ID = D.DIRECTOR_ID
+            WHERE D.NAME ILIKE ?
+            """;
+
     public FilmDBStorage(JdbcTemplate jdbc, RowMapper<Film> rowMapper, ResultSetExtractor<List<Film>> extractor) {
         super(jdbc, rowMapper, extractor);
     }
@@ -256,6 +281,16 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
                 return findPopularFilms(count);
             }
         }
+    }
+
+    @Override
+    public List<Film> findFilmsByQueryFilmTitle(String search) {
+        return findManyWithExtractor(FIND_FILMS_BY_FILM_TITLE_QUERY, search);
+    }
+
+    @Override
+    public List<Film> findFilmsByQueryDirectorName(String search) {
+        return findManyWithExtractor(FIND_FILMS_BY_DIRECTOR_NAME_QUERY, search);
     }
 
     @Override

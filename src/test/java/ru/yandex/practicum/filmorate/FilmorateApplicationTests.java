@@ -17,18 +17,18 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.GenreController;
 import ru.yandex.practicum.filmorate.controller.MpaController;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.service.director.DirectorService;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.service.genre.GenreService;
-import ru.yandex.practicum.filmorate.service.mpa.MpaService;
-import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.director.DirectorServiceImpl;
+import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
+import ru.yandex.practicum.filmorate.service.genre.GenreServiceImpl;
+import ru.yandex.practicum.filmorate.service.mpa.MpaServiceImpl;
+import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDBStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDBStorage;
+import ru.yandex.practicum.filmorate.storage.friend.FriendDBStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.RowMapperConfig;
 import ru.yandex.practicum.filmorate.storage.mappers.extractors.ResultSetExtractorConfig;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
-import ru.yandex.practicum.filmorate.storage.user.FriendDBStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 
 import java.util.Objects;
@@ -37,8 +37,8 @@ import java.util.Objects;
 @ContextConfiguration(classes = {
         UserController.class, FilmController.class, DirectorController.class,
         MpaController.class, GenreController.class,
-        UserService.class, FilmService.class, DirectorService.class,
-        MpaService.class, GenreService.class,
+        UserServiceImpl.class, FilmServiceImpl.class, DirectorServiceImpl.class,
+        MpaServiceImpl.class, GenreServiceImpl.class,
         UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class, DirectorDBStorage.class,
         MpaDBStorage.class, GenreDBStorage.class,
         ResultSetExtractorConfig.class,

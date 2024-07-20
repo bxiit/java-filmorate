@@ -8,14 +8,16 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
-import ru.yandex.practicum.filmorate.util.DurationDeserializer;
-import ru.yandex.practicum.filmorate.util.DurationSerializer;
 import ru.yandex.practicum.filmorate.util.annotations.MinDuration;
 import ru.yandex.practicum.filmorate.util.annotations.NotBefore;
+import ru.yandex.practicum.filmorate.util.parser.DurationDeserializer;
+import ru.yandex.practicum.filmorate.util.parser.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;

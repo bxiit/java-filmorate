@@ -13,7 +13,7 @@ spring:
       enabled: always
   sql:
     init:
-      mode: never
+      mode: always
 #  datasource:
 #    url: jdbc:h2:file:./db/filmorate;
 #    driverClassName: org.h2.Driver
