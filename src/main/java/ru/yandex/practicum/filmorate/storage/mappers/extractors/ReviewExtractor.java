@@ -23,7 +23,7 @@ public class ReviewExtractor implements ResultSetExtractor<List<Review>> {
 					reviewIdToReview.get(reviewId).getLikedBy().add(likeUserId);
 				}
 				long dislikeUserId = rs.getLong("dislike_user_id");
-				if (likeUserId != 0) {
+				if (dislikeUserId != 0) {
 					reviewIdToReview.get(reviewId).getDislikedBy().add(dislikeUserId);
 				}
 			} else {
@@ -39,7 +39,7 @@ public class ReviewExtractor implements ResultSetExtractor<List<Review>> {
 					review.getLikedBy().add(likeUserId);
 				}
 				long dislikeUserId = rs.getLong("dislike_user_id");
-				if (likeUserId != 0) {
+				if (dislikeUserId != 0) {
 					review.getDislikedBy().add(dislikeUserId);
 				}
 				reviewIdToReview.put(reviewId, review);
