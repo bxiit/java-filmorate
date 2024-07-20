@@ -14,6 +14,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 qodana.yaml
+volumes/**
 
 ### STS ###
 .apt_generated
