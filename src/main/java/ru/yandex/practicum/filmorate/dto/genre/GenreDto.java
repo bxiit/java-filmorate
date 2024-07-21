@@ -21,5 +21,4 @@ public class GenreDto implements Comparable<GenreDto> {
         }
         return Long.compare(this.id, genreDto.getId());
     }
-    //TODO NEVER USE COMPARABLE BECAUSE IT IS FOR GAYS
 }

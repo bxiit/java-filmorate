@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
 import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -28,9 +27,9 @@ public class UserServiceImpl implements UserService {
     private final FriendStorage friendStorage;
     private final FilmService filmService;
 
-    public UserServiceImpl(@Qualifier("UserDBStorage") UserStorage userStorage,
+    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage userStorage,
                            @Qualifier("friendDBStorage") FriendStorage friendStorage,
-                           FilmServiceImpl filmService) {
+                           FilmService filmService) {
         this.userStorage = userStorage;
         this.friendStorage = friendStorage;
         this.filmService = filmService;

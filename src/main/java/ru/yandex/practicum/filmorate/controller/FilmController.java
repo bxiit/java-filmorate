@@ -83,7 +83,6 @@ public class FilmController {
             @RequestParam(value = "year", required = false) Integer year) {
         if (genreId == null && year == null) {
             return filmService.findPopularFilmsByCount(count);
-            // TODO gandon
         } else {
             return filmService.findPopularFilmsByGenreAndYear(count, genreId, year);
         }

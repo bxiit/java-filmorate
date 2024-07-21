@@ -19,12 +19,12 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class FilmServiceTest extends BaseServiceTest<FilmServiceImpl> {
+class FilmServiceTest extends BaseServiceTest<FilmService> {
 
     private FilmDto basicFilmDto;
 
     @Autowired
-    public FilmServiceTest(FilmServiceImpl service) {
+    public FilmServiceTest(FilmService service) {
         super(service);
     }
 

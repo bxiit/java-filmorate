@@ -51,13 +51,11 @@ public class InMemoryUserStorage implements UserStorage, FriendStorage {
 
     @Override
     public List<User> findFriendsById(long userId) {
-        // todo: no need
         return List.of();
     }
 
     @Override
     public List<User> findCommonFriends(long userId, long friendId) {
-        // todo: no need
         return List.of();
     }
 

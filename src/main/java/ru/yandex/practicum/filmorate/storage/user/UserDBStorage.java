@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -15,8 +14,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Qualifier("UserDBStorage")
-@Primary
+@Qualifier("userDBStorage")
+//@Primary
 public class UserDBStorage extends BaseRepository<User> implements UserStorage {
     private static final String INSERT_QUERY = """
             INSERT INTO USERS (EMAIL, LOGIN, NAME, BIRTHDAY)

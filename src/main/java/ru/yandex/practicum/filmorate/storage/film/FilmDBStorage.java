@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Qualifier("FilmDBStorage")
+@Qualifier("filmDBStorage")
 @Primary
 public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
