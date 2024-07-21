@@ -86,16 +86,6 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> findFilmsByQueryFilmTitle(String search) {
-        return List.of();
-    }
-
-    @Override
-    public List<Film> findFilmsByQueryDirectorName(String search) {
-        return List.of();
-    }
-
-    @Override
     public boolean likeFilm(long filmId, long userId) {
         return false;
     }

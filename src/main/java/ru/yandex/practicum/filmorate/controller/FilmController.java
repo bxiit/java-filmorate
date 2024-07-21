@@ -64,22 +64,6 @@ public class FilmController {
         return filmServiceFacade.findFilmsByQuery(search, by);
     }
 
-    @GetMapping("/director/{directorId}")
-    public List<FilmDto> getFilmsByDirector(
-            @PathVariable("directorId") Long directorId,
-            @RequestParam("sortBy") String sortBy
-    ) {
-        return filmService.findFilmsByDirector(directorId, sortBy);
-    }
-
-    @GetMapping("/search")
-    public List<FilmDto> getFilmsByQuery(
-            @RequestParam("query") String search,
-            @RequestParam("by") SearchBy[] by
-    ) {
-        return filmService.findFilmsByQuery(search, by);
-    }
-
     @PutMapping()
     @ResponseStatus(OK)
     public FilmDto updateFilm(@Valid @RequestBody FilmDto request) {
