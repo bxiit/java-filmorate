@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
 
-@Mapper(builder = @Builder(disableBuilder = true), componentModel = "spring")
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface UserMapper {
 
     @Mapping(target = "friends", expression = "java(user.getFriends())")
@@ -20,11 +20,13 @@ public interface UserMapper {
     @Mapping(target = "friends", expression = "java(new java.util.HashSet<>())")
     User toUser(UserDto userDto);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "friends", expression = "java(new java.util.HashSet<>())")
     User mapNewUserToUser(NewUserRequest request);
 
 
-    @Mapping(ignore = true, target = "id")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "friends", ignore = true)
     @Mapping(target = "email", source = "request.email", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "name", source = "request.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "login", source = "request.login", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
