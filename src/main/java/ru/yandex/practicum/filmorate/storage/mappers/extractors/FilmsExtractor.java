@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -10,9 +11,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
     @Override
@@ -25,21 +28,28 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
             if (films.containsKey(filmId)) {
                 Film film = films.get(filmId);
                 // Добавление жанров
-                addGenre(rs, film);
+                setGenre(rs, film);
                 // Добавление лайков (айди юзеров)
-                addLike(rs, film);
+                setLike(rs, film);
+                // Добавление режиссера
+                setDirectory(rs, film);
                 continue;
             }
-            Film film = new Film();
-            film.setId(rs.getLong("film_id"));
-            film.setName(rs.getString("name"));
-            film.setDescription(rs.getString("description"));
-            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
             long durationSeconds = rs.getLong("duration");
-            film.setDuration(Duration.ofSeconds(durationSeconds));
-            addLike(rs, film);
+            Film film = Film
+                    .builder()
+                    .id(filmId)
+                    .name(rs.getString("name"))
+                    .description(rs.getString("description"))
+                    .releaseDate(rs.getDate("release_date").toLocalDate())
+                    .duration(
+                            Duration.ofSeconds(durationSeconds)
+                    )
+                    .build();
+            setLike(rs, film);
             setMpa(rs, film);
-            addGenre(rs, film);
+            setGenre(rs, film);
+            setDirectory(rs, film);
             films.put(film.getId(), film);
         }
         return new ArrayList<>(films.values());
@@ -50,26 +60,48 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
         if (mpaId == 0) {
             return;
         }
-        MpaDto mpaDto = new MpaDto();
-        mpaDto.setId(mpaId);
+        MpaDto mpaDto = MpaDto.builder()
+                .id(mpaId)
+                .build();
         film.setMpa(mpaDto);
     }
 
-    private void addLike(ResultSet rs, Film film) throws SQLException {
+    private void setLike(ResultSet rs, Film film) throws SQLException {
         long likedUserId = rs.getLong("liked_user_id");
         if (likedUserId == 0) {
             return;
         }
+        if (film.getLikedUsersIDs() == null) {
+            film.setLikedUsersIDs(new HashSet<>());
+        }
         film.getLikedUsersIDs().add(likedUserId);
     }
 
-    private void addGenre(ResultSet rs, Film film) throws SQLException {
+    private void setGenre(ResultSet rs, Film film) throws SQLException {
         long genreId = rs.getLong("genre_id");
         if (genreId == 0) {
             return;
         }
-        GenreDto genreDto = new GenreDto();
-        genreDto.setId(genreId);
+        if (film.getGenres() == null) {
+            film.setGenres(new TreeSet<>());
+        }
+        GenreDto genreDto = GenreDto.builder()
+                .id(genreId)
+                .build();
         film.getGenres().add(genreDto);
+    }
+
+    private void setDirectory(ResultSet rs, Film film) throws SQLException {
+        long directoryId = rs.getLong("director_id");
+        if (directoryId == 0) {
+            return;
+        }
+        if (film.getDirectors() == null) {
+            film.setDirectors(new HashSet<>());
+        }
+        DirectorDto directorDto = DirectorDto.builder()
+                .id(directoryId)
+                .build();
+        film.getDirectors().add(directorDto);
     }
 }

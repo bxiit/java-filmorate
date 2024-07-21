@@ -14,7 +14,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,11 +41,14 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
-        Film film = new Film(
-                null, "Социальная сеть", "Один из лучших фильмов",
-                LocalDate.of(2010, Month.OCTOBER, 28),
-                Duration.ofMinutes(120), new HashSet<>(), pg13MpaDto, genresDtoSet
-        );
+        Film film = Film.builder()
+                .name("Социальная сеть")
+                .description("Один из лучших фильмов")
+                .releaseDate(LocalDate.of(2010, Month.OCTOBER, 28))
+                .duration(Duration.ofMinutes(120))
+                .mpa(pg13MpaDto)
+                .genres(genresDtoSet)
+                .build();
 
         storage.addFilm(film);
 
@@ -56,13 +58,13 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
                 .isPresent()
                 .hasValueSatisfying(
                         f -> assertThat(f).hasFieldOrPropertyWithValue("name", "Социальная сеть")
-                        .hasFieldOrPropertyWithValue(
-                                "description", "Один из лучших фильмов"
-                        )
-                        .hasFieldOrPropertyWithValue(
-                                "releaseDate", LocalDate.of(2010, Month.OCTOBER, 28)
-                        )
-                        .hasFieldOrPropertyWithValue("duration", Duration.ofMinutes(120))
+                                .hasFieldOrPropertyWithValue(
+                                        "description", "Один из лучших фильмов"
+                                )
+                                .hasFieldOrPropertyWithValue(
+                                        "releaseDate", LocalDate.of(2010, Month.OCTOBER, 28)
+                                )
+                                .hasFieldOrPropertyWithValue("duration", Duration.ofMinutes(120))
                 );
     }
 
@@ -87,11 +89,14 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
-        Film film = new Film(
-                null, "Социальная сеть", "Один из лучших фильмов",
-                LocalDate.of(2010, Month.OCTOBER, 28),
-                Duration.ofMinutes(120), new HashSet<>(), pg13MpaDto, genresDtoSet
-        );
+        Film film = Film.builder()
+                .name("Социальная сеть")
+                .description("Один из лучших фильмов")
+                .releaseDate(LocalDate.of(2010, Month.OCTOBER, 28))
+                .duration(Duration.ofMinutes(120))
+                .mpa(pg13MpaDto)
+                .genres(genresDtoSet)
+                .build();
 
         storage.addFilm(film);
         boolean isDeleted = storage.deleteFilmById(film.getId());
@@ -116,11 +121,14 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
-        Film film = new Film(
-                null, "Социальная сеть", "Один из лучших фильмов",
-                LocalDate.of(2010, Month.OCTOBER, 28),
-                Duration.ofMinutes(120), new HashSet<>(), pg13MpaDto, genresDtoSet
-        );
+        Film film = Film.builder()
+                .name("Социальная сеть")
+                .description("Один из лучших фильмов")
+                .releaseDate(LocalDate.of(2010, Month.OCTOBER, 28))
+                .duration(Duration.ofMinutes(120))
+                .mpa(pg13MpaDto)
+                .genres(genresDtoSet)
+                .build();
 
         storage.addFilm(film);
         boolean isLiked = storage.likeFilm(film.getId(), 1L);
@@ -143,11 +151,14 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
-        Film film = new Film(
-                null, "Социальная сеть", "Один из лучших фильмов",
-                LocalDate.of(2010, Month.OCTOBER, 28),
-                Duration.ofMinutes(120), new HashSet<>(), pg13MpaDto, genresDtoSet
-        );
+        Film film = Film.builder()
+                .name("Социальная сеть")
+                .description("Один из лучших фильмов")
+                .releaseDate(LocalDate.of(2010, Month.OCTOBER, 28))
+                .duration(Duration.ofMinutes(120))
+                .mpa(pg13MpaDto)
+                .genres(genresDtoSet)
+                .build();
 
         storage.addFilm(film);
         storage.likeFilm(film.getId(), 1L);
@@ -163,18 +174,21 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
-        Film film = new Film(
-                null, "Социальная сеть", "Один из лучших фильмов",
-                LocalDate.of(2010, Month.OCTOBER, 28),
-                Duration.ofMinutes(120), new HashSet<>(), pg13MpaDto, genresDtoSet
-        );
+        Film film = Film.builder()
+                .name("Социальная сеть")
+                .description("Один из лучших фильмов")
+                .releaseDate(LocalDate.of(2010, Month.OCTOBER, 28))
+                .duration(Duration.ofMinutes(120))
+                .mpa(pg13MpaDto)
+                .genres(genresDtoSet)
+                .build();
 
         storage.addFilm(film);
 
         Optional<Film> addedFilmOptional = storage.findFilmById(film.getId());
         Film addedFilm = addedFilmOptional.get();
 
-        FilmDto updateUserRequest = new FilmDto();
+        FilmDto updateUserRequest = FilmDto.builder().build();
         updateUserRequest.setName("updated name");
 
         MpaDto pgMpaDto = new MpaDto();
