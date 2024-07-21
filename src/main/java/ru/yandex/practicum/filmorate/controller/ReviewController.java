@@ -74,6 +74,5 @@ public class ReviewController {
     @DeleteMapping("/{id}/dislike/{userId}")
     public void removeDislike(@PathVariable("id") long reviewId, @PathVariable("userId") long userId) {
         reviewServiceFacade.removeDislike(reviewId, userId);
-
     }
 }
