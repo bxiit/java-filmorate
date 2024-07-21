@@ -1,6 +1,6 @@
 logging:
   level:
-    org.zalando.logbook: off
+    org.zalando.logbook: trace
 spring:
   banner:
     location: classpath:banners/banner.txt

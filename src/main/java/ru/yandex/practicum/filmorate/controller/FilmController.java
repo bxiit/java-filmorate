@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
 
 import java.util.List;
 
@@ -53,6 +54,14 @@ public class FilmController {
             @RequestParam("sortBy") String sortBy
     ) {
         return filmService.findFilmsByDirector(directorId, sortBy);
+    }
+
+    @GetMapping("/search")
+    public List<FilmDto> getFilmsByQuery(
+            @RequestParam("query") String search,
+            @RequestParam("by") SearchBy[] by
+    ) {
+        return filmService.findFilmsByQuery(search, by);
     }
 
     @PutMapping()

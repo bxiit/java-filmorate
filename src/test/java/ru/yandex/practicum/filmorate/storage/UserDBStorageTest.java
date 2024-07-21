@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
-import ru.yandex.practicum.filmorate.storage.user.friend.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -17,12 +17,14 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class UserDBStorageTest extends BaseDBStorageTest<UserDBStorage> {
+public class UserDBStorageTest extends BaseDBStorageTest<UserStorage> {
     private final FriendStorage friendStorage;
 
     @Autowired
-    public UserDBStorageTest(UserDBStorage userDBStorage, @Qualifier("friendDBStorage") FriendStorage friendStorage) {
-        super(userDBStorage);
+    public UserDBStorageTest(
+            @Qualifier("userDBStorage") UserStorage userStorage,
+            @Qualifier("friendDBStorage") FriendStorage friendStorage) {
+        super(userStorage);
         this.friendStorage = friendStorage;
     }
 

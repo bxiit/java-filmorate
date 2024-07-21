@@ -1,19 +1,22 @@
-package ru.yandex.practicum.filmorate.exception.handler;
+package ru.yandex.practicum.filmorate.controller.advice;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exception.AlreadyDoneException;
 import ru.yandex.practicum.filmorate.exception.ConflictException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.TemporarilyNotAvailableException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
+import ru.yandex.practicum.filmorate.util.parser.EnumPropertyEditorSupport;
 
-import java.net.URISyntaxException;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -25,8 +28,13 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(SearchBy.class, EnumPropertyEditorSupport.forEnum(SearchBy.class));
+    }
+
     @ExceptionHandler(ValidationException.class)
-    public ProblemDetail handleValidationException(ValidationException e) throws URISyntaxException {
+    public ProblemDetail handleValidationException(ValidationException e) {
         log.error(e.getMessage());
         return commonExceptionHandle(BAD_REQUEST, e.getMessage());
     }
