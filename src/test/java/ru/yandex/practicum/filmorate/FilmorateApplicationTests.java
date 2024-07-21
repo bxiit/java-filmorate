@@ -16,10 +16,14 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.GenreController;
 import ru.yandex.practicum.filmorate.controller.MpaController;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmServiceFacade;
 import ru.yandex.practicum.filmorate.service.genre.GenreService;
 import ru.yandex.practicum.filmorate.service.mpa.MpaService;
 import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.user.UserServiceFacade;
+import ru.yandex.practicum.filmorate.storage.event.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDBStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.RowMapperConfig;
@@ -35,10 +39,12 @@ import java.util.Objects;
 @ContextConfiguration(classes = {
         UserController.class, FilmController.class,
         MpaController.class, GenreController.class,
+        UserServiceFacade.class, FilmServiceFacade.class,
+        EventService.class,
         UserService.class, FilmService.class,
         MpaService.class, GenreService.class,
         UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class,
-        MpaDBStorage.class, GenreDBStorage.class,
+        MpaDBStorage.class, GenreDBStorage.class, EventDbStorage.class,
         ResultSetExtractorConfig.class,
         RowMapperConfig.class
 })
