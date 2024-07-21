@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.dto.event.EventDto;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.user.UserDto;
-import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.service.event.EventService;
 import ru.yandex.practicum.filmorate.service.user.UserServiceFacade;
 
@@ -117,7 +117,7 @@ public class UserController {
 
     @GetMapping("/{id}/feed")
     @ResponseStatus(OK)
-    public List<Event> findFeed(@PathVariable("id") long userId) {
+    public List<EventDto> findFeed(@PathVariable("id") long userId) {
         log.info("Получение ленты событий пользователя с ID = {}", userId);
         return eventService.findFeedByUserId(userId);
     }

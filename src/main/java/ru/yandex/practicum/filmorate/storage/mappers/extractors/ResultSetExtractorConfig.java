@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.Event;
 
 import java.util.List;
 
@@ -42,5 +43,10 @@ public class ResultSetExtractorConfig {
     @Bean
     public ResultSetExtractor<List<Director>> directorResultSetExtractor() {
         return new DirectorExtractor();
+    }
+
+    @Bean
+    public ResultSetExtractor<List<Event>> eventResultSetExtractor() {
+        return new EventExtractor();
     }
 }
