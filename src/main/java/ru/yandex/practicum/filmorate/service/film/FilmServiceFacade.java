@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.service.event.EventService;
+import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
 
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class FilmServiceFacade {
 
     public FilmDto findFilmById(long filmId) {
         return filmService.findFilmById(filmId);
+    }
+
+    public List<FilmDto> findFilmsByDirector(Long directorId, String sort) {
+        return filmService.findFilmsByDirector(directorId, sort);
     }
 
     public List<FilmDto> findAllFilms() {
@@ -41,6 +46,10 @@ public class FilmServiceFacade {
 
     public List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
         return filmService.findPopularFilmsByGenreAndYear(count, genreId, year);
+    }
+
+    public List<FilmDto> findFilmsByQuery(String search, SearchBy[] by) {
+        return filmService.findFilmsByQuery(search, by);
     }
 
     public void likeFilm(long filmId, long userId) {

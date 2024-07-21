@@ -20,13 +20,13 @@ VALUES ('Айсултан Сейтов'),
        ('Джеймс Кэмерон'),
        ('Гай Ричи');
 
-INSERT INTO EVENT_TYPES (EVENT_TYPE) VALUES
-                           ( 'LIKE' ),
-                           ( 'REVIEW' ),
-                           ( 'FRIEND' ),
-                           ( 'DISLIKE' );
+INSERT INTO EVENT_TYPES (EVENT_TYPE)
+VALUES ('LIKE'),
+       ('REVIEW'),
+       ('FRIEND'),
+       ('DISLIKE');
 
-INSERT INTO OPERATIONS (OPERATION) VALUES
-                           ( 'ADD' ),
-                           ( 'UPDATE' ),
-                           ( 'REMOVE' );
+INSERT INTO OPERATIONS (OPERATION)
+VALUES ('ADD'),
+       ('UPDATE'),
+       ('REMOVE');
