@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
@@ -24,6 +25,7 @@ import java.util.TreeSet;
 @Data
 @Builder(toBuilder = true)
 @AllArgsConstructor
+@FieldNameConstants
 public class Film {
 
     public Film() {

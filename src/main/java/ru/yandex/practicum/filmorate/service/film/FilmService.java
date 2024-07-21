@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
+import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
 
 import java.util.List;
 
@@ -21,9 +22,7 @@ public interface FilmService {
 
     List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year);
 
-    List<FilmDto> findFilmsByQuery(String search, String by);
-
-    List<FilmDto> findFilmsByQueryOpt(String search, String by);
+    List<FilmDto> findFilmsByQuery(String search, SearchBy[] by);
 
     void likeFilm(long filmId, long userId);
 

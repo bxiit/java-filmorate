@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
-    public static final String COMMA = ",";
     public static final String SQL_WILDCARD = "%";
 
     public static String addWildCards(String string) {

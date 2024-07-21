@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,17 +20,14 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
 import ru.yandex.practicum.filmorate.util.enums.sort.SortBy;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static ru.yandex.practicum.filmorate.util.constants.Constants.COMMA;
 import static ru.yandex.practicum.filmorate.util.constants.Constants.addWildCards;
-import static ru.yandex.practicum.filmorate.util.parser.StringEnumParser.parseStringToEnum;
 
 @Slf4j
 @Service
@@ -44,6 +42,16 @@ public class FilmServiceImpl implements FilmService {
     private final GenreStorage genreStorage;
 
     private final DirectorService directorService;
+
+    private Map<SearchBy, Function<String, List<Film>>> searchByMap;
+
+    @PostConstruct
+    void postConstruct() {
+        searchByMap = Map.of(
+                SearchBy.TITLE, filmStorage::findFilmsByQueryFilmTitle,
+                SearchBy.DIRECTOR, filmStorage::findFilmsByQueryDirectorName
+        );
+    }
 
     @Override
     public FilmDto addFilm(FilmDto request) {
@@ -117,35 +125,12 @@ public class FilmServiceImpl implements FilmService {
                 .toList();
     }
 
-    @Override
-    public List<FilmDto> findFilmsByQuery(String search, String by) {
-        List<Film> result = new ArrayList<>();
-        search = addWildCards(search);
-        Set<SearchBy> searchBys = parseStringToEnum(by, COMMA, SearchBy.class);
-        for (SearchBy s : searchBys) {
-            if (Objects.equals(s, SearchBy.TITLE))
-                result.addAll(filmStorage.findFilmsByQueryFilmTitle(search));
-            else if (Objects.equals(s, SearchBy.DIRECTOR)) {
-                result.addAll(filmStorage.findFilmsByQueryDirectorName(search));
-            }
-        }
-        return result.stream()
-                .map(FilmMapper.MAPPER::mapToFilmDto)
-                .sorted(SortBy.LIKES.sortComparator())
-                .map(this::fillFilmParams)
-                .toList()
-                .reversed();
-    }
-
 
     @Override
-    public List<FilmDto> findFilmsByQueryOpt(String search, String by) {
+    public List<FilmDto> findFilmsByQuery(String search, SearchBy[] by) {
         final String searchArgument = addWildCards(search);
-        Map<SearchBy, Function<String, List<Film>>> searchByMap = Map.of(
-                SearchBy.TITLE, filmStorage::findFilmsByQueryFilmTitle,
-                SearchBy.DIRECTOR, filmStorage::findFilmsByQueryDirectorName
-        );
-        return parseStringToEnum(by, COMMA, SearchBy.class).stream()
+
+        return Arrays.stream(by)
                 .flatMap(searchBy -> searchByMap.get(searchBy).apply(searchArgument).stream())
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .sorted(SortBy.LIKES.sortComparator())

@@ -17,10 +17,15 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.GenreController;
 import ru.yandex.practicum.filmorate.controller.MpaController;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.service.director.DirectorService;
 import ru.yandex.practicum.filmorate.service.director.DirectorServiceImpl;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
+import ru.yandex.practicum.filmorate.service.genre.GenreService;
 import ru.yandex.practicum.filmorate.service.genre.GenreServiceImpl;
+import ru.yandex.practicum.filmorate.service.mpa.MpaService;
 import ru.yandex.practicum.filmorate.service.mpa.MpaServiceImpl;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.director.DirectorDBStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDBStorage;
@@ -39,6 +44,9 @@ import java.util.Objects;
         MpaController.class, GenreController.class,
         UserServiceImpl.class, FilmServiceImpl.class, DirectorServiceImpl.class,
         MpaServiceImpl.class, GenreServiceImpl.class,
+        UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class, DirectorDBStorage.class,
+        UserService.class, FilmService.class, DirectorService.class,
+        MpaService.class, GenreService.class,
         UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class, DirectorDBStorage.class,
         MpaDBStorage.class, GenreDBStorage.class,
         ResultSetExtractorConfig.class,
