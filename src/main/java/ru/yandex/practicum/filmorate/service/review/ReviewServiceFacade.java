@@ -17,15 +17,25 @@ public class ReviewServiceFacade {
     private final EventService eventService;
 
     public Review addReview(Review review) {
-        return reviewService.addReview(review);
+        review = reviewService.addReview(review);
+        eventService.createEvent(review.getUserId(), review.getReviewId(), EventType.REVIEW, Operation.ADD);
+        return review;
     }
 
     public Review updateReview(Review review) {
-        return reviewService.updateReview(review);
+        review = reviewService.updateReview(review);
+        eventService.createEvent(review.getUserId(), review.getReviewId(), EventType.REVIEW, Operation.UPDATE);
+        return review;
     }
 
     public boolean deleteReview(long reviewId) {
-        return reviewService.deleteReview(reviewId);
+        Review review = reviewService.getReviewById(reviewId).get();
+
+        if (reviewService.deleteReview(reviewId)) {
+            eventService.createEvent(review.getUserId(), review.getReviewId(), EventType.REVIEW, Operation.REMOVE);
+            return true;
+        }
+        return false;
     }
 
     public List<Review> getReviews(long filmId, int count) {
@@ -38,12 +48,10 @@ public class ReviewServiceFacade {
 
     public void likeReview(long reviewId, long userId) {
         reviewService.likeReview(reviewId, userId);
-        eventService.addEvent(userId, reviewId, EventType.LIKE, Operation.ADD);
     }
 
     public void removeLike(long reviewId, long userId) {
         reviewService.removeLike(reviewId, userId);
-        eventService.addEvent(userId, reviewId, EventType.LIKE, Operation.REMOVE);
     }
 
     public void dislikeReview(long reviewId, long userId) {

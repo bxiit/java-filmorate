@@ -45,11 +45,12 @@ public class FilmServiceFacade {
 
     public void likeFilm(long filmId, long userId) {
         filmService.likeFilm(filmId, userId);
-        eventService.addEvent(userId, filmId, EventType.LIKE, Operation.ADD);
+        eventService.createEvent(userId, filmId, EventType.LIKE, Operation.ADD);
     }
 
     public void unlikeFilm(long filmId, long userId) {
         filmService.unlikeFilm(filmId, userId);
+        eventService.createEvent(userId, filmId, EventType.LIKE, Operation.REMOVE);
     }
 
     public List<FilmDto> getFilmRecommendations(long userId) {
