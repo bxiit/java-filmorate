@@ -47,6 +47,14 @@ public class FilmController {
         return filmService.findAllFilms();
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> getFilmsByDirector(
+            @PathVariable("directorId") Long directorId,
+            @RequestParam("sortBy") String sortBy
+    ) {
+        return filmService.findFilmsByDirector(directorId, sortBy);
+    }
+
     @PutMapping()
     @ResponseStatus(OK)
     public FilmDto updateFilm(@Valid @RequestBody FilmDto request) {
@@ -87,7 +95,7 @@ public class FilmController {
     @GetMapping("/common")
     @ResponseStatus(OK)
     public List<FilmDto> commonFilmsWithFriend(@RequestParam(value = "userId") long userId,
-                                                @RequestParam(value = "friendId") long friendId) {
+                                               @RequestParam(value = "friendId") long friendId) {
         return filmService.commonFilmsWithFriend(userId, friendId);
     }
 }

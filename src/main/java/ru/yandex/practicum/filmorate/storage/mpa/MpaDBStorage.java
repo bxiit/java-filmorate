@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 @Primary
-public class MpaDBStorage extends BaseRepository<Mpa> {
+public class MpaDBStorage extends BaseRepository<Mpa> implements MpaStorage {
 
     private static final String FIND_ALL_QUERY = "SELECT * FROM MPA ORDER BY MPA_ID";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM MPA WHERE MPA_ID = ? ORDER BY MPA_ID";
@@ -22,10 +22,12 @@ public class MpaDBStorage extends BaseRepository<Mpa> {
         super(jdbc, rowMapper, extractor);
     }
 
+    @Override
     public Optional<Mpa> findMpaById(long mpaId) {
         return findOne(FIND_BY_ID_QUERY, mpaId);
     }
 
+    @Override
     public List<Mpa> findAllMpa() {
         return findMany(FIND_ALL_QUERY);
     }

@@ -16,6 +16,11 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import java.net.URISyntaxException;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -23,21 +28,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ProblemDetail handleValidationException(ValidationException e) throws URISyntaxException {
         log.error(e.getMessage());
-
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        return commonExceptionHandle(BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ProblemDetail handleNotFoundException(NotFoundException e) {
         log.error(e.getMessage());
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        return commonExceptionHandle(NOT_FOUND, e.getMessage());
     }
 
     // Валидация аннотацией в моделях
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleThrowable(MethodArgumentNotValidException e) {
         log.error(e.getMessage());
-
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
@@ -47,25 +50,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AlreadyDoneException.class)
     public ProblemDetail handleUserAlreadyExist(final AlreadyDoneException e) {
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.CONFLICT,
-                e.getMessage()
-        );
+        log.error(e.getMessage());
+        return commonExceptionHandle(CONFLICT, e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
     public ProblemDetail handleConflict(ConflictException e) {
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.CONFLICT,
-                e.getMessage()
-        );
+        log.error(e.getMessage());
+        return commonExceptionHandle(CONFLICT, e.getMessage());
     }
 
     @ExceptionHandler(TemporarilyNotAvailableException.class)
     public ProblemDetail handleTemporarilyNotAvailableException(TemporarilyNotAvailableException e) {
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_ACCEPTABLE,
-                e.getMessage()
-        );
+        log.error(e.getMessage());
+        return commonExceptionHandle(NOT_ACCEPTABLE, e.getMessage());
+    }
+
+    private ProblemDetail commonExceptionHandle(HttpStatus httpStatus, String message) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(httpStatus, message);
+        problemDetail.setProperty("error", message);
+        return problemDetail;
     }
 }
