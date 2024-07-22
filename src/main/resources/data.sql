@@ -13,13 +13,6 @@ VALUES ('Комедия'),
        ('Документальный'),
        ('Боевик');
 
-INSERT INTO director (name)
-VALUES ('Айсултан Сейтов'),
-       ('Квентин Тарантино'),
-       ('Вуди Аллен'),
-       ('Джеймс Кэмерон'),
-       ('Гай Ричи');
-
 INSERT INTO EVENT_TYPES (EVENT_TYPE)
 VALUES ('LIKE'),
        ('REVIEW'),
