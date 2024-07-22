@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseRepository;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.FilmWithDirectorExtractor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -212,9 +214,11 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             LEFT JOIN PUBLIC.DIRECTOR D ON FD.DIRECTOR_ID = D.DIRECTOR_ID
             WHERE D.NAME ILIKE ?
             """;
+    private final FilmWithDirectorExtractor filmWithDirectorExtractor;
 
     public FilmDBStorage(JdbcTemplate jdbc, RowMapper<Film> rowMapper, ResultSetExtractor<List<Film>> extractor) {
         super(jdbc, rowMapper, extractor);
+        filmWithDirectorExtractor = new FilmWithDirectorExtractor();
     }
 
     @Override
@@ -246,7 +250,15 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public Optional<Film> findFilmById(long filmId) {
-        return findOneWithExtractor(FIND_BY_ID_QUERY, filmId);
+        try {
+            List<Film> result = jdbc.query(FIND_BY_ID_QUERY, filmWithDirectorExtractor, filmId);
+            if (result == null || result.isEmpty()) {
+                return Optional.empty();
+            }
+            return Optional.ofNullable(result.getFirst());
+        } catch (EmptyResultDataAccessException ignored) {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -285,12 +297,12 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public List<Film> findFilmsByQueryFilmTitle(String search) {
-        return findManyWithExtractor(FIND_FILMS_BY_FILM_TITLE_QUERY, search);
+        return jdbc.query(FIND_FILMS_BY_FILM_TITLE_QUERY, filmWithDirectorExtractor, search);
     }
 
     @Override
     public List<Film> findFilmsByQueryDirectorName(String search) {
-        return findManyWithExtractor(FIND_FILMS_BY_DIRECTOR_NAME_QUERY, search);
+        return jdbc.query(FIND_FILMS_BY_DIRECTOR_NAME_QUERY, filmWithDirectorExtractor, search);
     }
 
     @Override

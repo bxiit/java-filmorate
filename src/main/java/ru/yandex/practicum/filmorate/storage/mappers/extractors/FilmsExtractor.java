@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -55,7 +54,7 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
         return new ArrayList<>(films.values());
     }
 
-    private void setMpa(ResultSet rs, Film film) throws SQLException {
+    protected void setMpa(ResultSet rs, Film film) throws SQLException {
         long mpaId = rs.getLong("mpa_id");
         if (mpaId == 0) {
             return;
@@ -66,7 +65,7 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
         film.setMpa(mpaDto);
     }
 
-    private void setLike(ResultSet rs, Film film) throws SQLException {
+    protected void setLike(ResultSet rs, Film film) throws SQLException {
         long likedUserId = rs.getLong("liked_user_id");
         if (likedUserId == 0) {
             return;
@@ -77,7 +76,7 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
         film.getLikedUsersIDs().add(likedUserId);
     }
 
-    private void setGenre(ResultSet rs, Film film) throws SQLException {
+    protected void setGenre(ResultSet rs, Film film) throws SQLException {
         long genreId = rs.getLong("genre_id");
         if (genreId == 0) {
             return;
@@ -91,17 +90,6 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
         film.getGenres().add(genreDto);
     }
 
-    private void setDirectory(ResultSet rs, Film film) throws SQLException {
-        long directoryId = rs.getLong("director_id");
-        if (directoryId == 0) {
-            return;
-        }
-        if (film.getDirectors() == null) {
-            film.setDirectors(new HashSet<>());
-        }
-        DirectorDto directorDto = DirectorDto.builder()
-                .id(directoryId)
-                .build();
-        film.getDirectors().add(directorDto);
+    protected void setDirectory(ResultSet rs, Film film) throws SQLException {
     }
 }
