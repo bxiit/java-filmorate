@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service.film;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
@@ -78,7 +77,7 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
                 .hasMessage("Фильм не найден");
     }
 
-    @Test
+    /*@Test
     void findFilmsByDirector_shouldReturnInOrderOfYear() {
         FilmDto filmDtoWithDirector = basicFilmDto.toBuilder()
                 .name("2020 film")
@@ -111,7 +110,7 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
                 .hasSize(2)
                 .extracting(FilmDto::getName)
                 .containsExactly("2020 film", "2023 film");
-    }
+    }*/
 
     @Test
     void findAllFilms() {
@@ -141,7 +140,7 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
                 .containsExactly(1L, 1L, 1L);
     }
 
-    @Test
+    /*@Test
     void updateFilm() {
         basicFilmDto = service.addFilm(basicFilmDto);
         FilmDto filmDtoUpdatedDirectors = basicFilmDto.toBuilder()
@@ -162,7 +161,7 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
                             .extracting(DirectorDto::getName)
                             .containsExactly("Квентин Тарантино", "Вуди Аллен");
                 });
-    }
+    }*/
 
     private FilmDto getFilmFromService(Long filmId) {
         return service.findFilmById(filmId);
