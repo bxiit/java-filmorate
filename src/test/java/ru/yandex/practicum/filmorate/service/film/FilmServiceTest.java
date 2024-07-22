@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.service.BaseServiceTest;
+import ru.yandex.practicum.filmorate.util.enums.sort.SortBy;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -98,7 +99,7 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
                 .build();
 
         service.addFilm(filmDtoWithDirector2);
-        List<FilmDto> filmsByDirector = service.findFilmsByDirector(2L, "year");
+        List<FilmDto> filmsByDirector = service.findFilmsByDirector(2L, SortBy.YEAR);
 
         assertThat(filmsByDirector)
                 .hasSize(2)

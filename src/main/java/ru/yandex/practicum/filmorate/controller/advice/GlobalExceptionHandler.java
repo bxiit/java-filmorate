@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.TemporarilyNotAvailableException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
+import ru.yandex.practicum.filmorate.util.enums.sort.SortBy;
 import ru.yandex.practicum.filmorate.util.parser.EnumPropertyEditorSupport;
 
 import java.util.stream.Collectors;
@@ -29,8 +30,9 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class GlobalExceptionHandler {
 
     @InitBinder
-    public void initBinder(WebDataBinder binder) {
+    public void initBinderSearchBy(WebDataBinder binder) {
         binder.registerCustomEditor(SearchBy.class, EnumPropertyEditorSupport.forEnum(SearchBy.class));
+        binder.registerCustomEditor(SortBy.class, EnumPropertyEditorSupport.forEnum(SortBy.class));
     }
 
     @ExceptionHandler(ValidationException.class)

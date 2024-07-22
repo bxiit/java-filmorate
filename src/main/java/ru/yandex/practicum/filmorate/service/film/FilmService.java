@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
+import ru.yandex.practicum.filmorate.util.enums.sort.SortBy;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface FilmService {
 
     FilmDto findFilmById(long filmId);
 
-    List<FilmDto> findFilmsByDirector(Long directorId, String sort);
+    List<FilmDto> findFilmsByDirector(Long directorId, SortBy sort);
 
     List<FilmDto> findAllFilms();
 
