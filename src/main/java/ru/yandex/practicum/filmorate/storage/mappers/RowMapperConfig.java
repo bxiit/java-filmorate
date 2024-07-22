@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.event.Event;
 
 @Configuration
 public class RowMapperConfig {
@@ -40,5 +41,10 @@ public class RowMapperConfig {
     @Bean
     public RowMapper<Director> directorRowMapper() {
         return new DirectorRowMapper();
+    }
+
+    @Bean
+    public RowMapper<Event> eventRowMapper() {
+        return new EventRowMapper();
     }
 }
