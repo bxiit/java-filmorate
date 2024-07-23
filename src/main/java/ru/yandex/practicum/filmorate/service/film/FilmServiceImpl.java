@@ -141,11 +141,17 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void likeFilm(long filmId, long userId) {
+        if (filmId < 0 || userId < 0) {
+            throw new NotFoundException();
+        }
         filmStorage.likeFilm(filmId, userId);
     }
 
     @Override
     public void unlikeFilm(long filmId, long userId) {
+        if (filmId < 0 || userId < 0) {
+            throw new NotFoundException();
+        }
         filmStorage.unlikeFilm(filmId, userId);
     }
 
