@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -91,5 +92,16 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
     }
 
     protected void setDirectory(ResultSet rs, Film film) throws SQLException {
+        long directoryId = rs.getLong("director_id");
+        if (directoryId == 0) {
+            return;
+        }
+        if (film.getDirectors() == null) {
+            film.setDirectors(new HashSet<>());
+        }
+        DirectorDto directorDto = DirectorDto.builder()
+                .id(directoryId)
+                .build();
+        film.getDirectors().add(directorDto);
     }
 }

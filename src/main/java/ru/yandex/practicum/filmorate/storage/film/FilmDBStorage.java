@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseRepository;
-import ru.yandex.practicum.filmorate.storage.mappers.extractors.FilmWithDirectorExtractor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -224,11 +223,9 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
             LEFT JOIN PUBLIC.DIRECTOR D ON FD.DIRECTOR_ID = D.DIRECTOR_ID
             WHERE D.NAME ILIKE ?
             """;
-    private final FilmWithDirectorExtractor filmWithDirectorExtractor;
 
     public FilmDBStorage(JdbcTemplate jdbc, RowMapper<Film> rowMapper, ResultSetExtractor<List<Film>> extractor) {
         super(jdbc, rowMapper, extractor);
-        filmWithDirectorExtractor = new FilmWithDirectorExtractor();
     }
 
     @Override
@@ -261,7 +258,7 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
     @Override
     public Optional<Film> findFilmById(long filmId) {
         try {
-            List<Film> result = jdbc.query(FIND_BY_ID_QUERY, filmWithDirectorExtractor, filmId);
+            List<Film> result = jdbc.query(FIND_BY_ID_QUERY, extractor, filmId);
             if (result == null || result.isEmpty()) {
                 return Optional.empty();
             }
@@ -307,12 +304,12 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public List<Film> findFilmsByQueryFilmTitle(String search) {
-        return jdbc.query(FIND_FILMS_BY_FILM_TITLE_QUERY, filmWithDirectorExtractor, search);
+        return jdbc.query(FIND_FILMS_BY_FILM_TITLE_QUERY, extractor, search);
     }
 
     @Override
     public List<Film> findFilmsByQueryDirectorName(String search) {
-        return jdbc.query(FIND_FILMS_BY_DIRECTOR_NAME_QUERY, filmWithDirectorExtractor, search);
+        return jdbc.query(FIND_FILMS_BY_DIRECTOR_NAME_QUERY, extractor, search);
     }
 
     @Override
