@@ -172,10 +172,10 @@ public class FilmServiceImpl implements FilmService {
     }
 
     private void updateDirectorOfFilm(FilmDto filmDto) {
+        directorService.deleteDirectorOfFilm(filmDto.getId());
         if (filmDto.getDirectors() == null) {
             return;
         }
-        directorService.deleteDirectorOfFilm(filmDto.getId());
         for (DirectorDto directorDto : filmDto.getDirectors()) {
             Director director = DirectorMapper.MAPPER.mapToModel(directorDto);
             directorService.addDirectorForFilm(filmDto.getId(), director);
