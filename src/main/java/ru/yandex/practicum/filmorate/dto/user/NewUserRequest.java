@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @Data
 public class NewUserRequest {
 
+    @NotNull(message = "Не валидное имя")
     private String name;
 
     @NotNull(message = "Пустой адрес электронной почты")
@@ -28,4 +29,8 @@ public class NewUserRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @PastOrPresent(message = "Некорректная дата дня рождения")
     private LocalDate birthday;
+
+    public String getName() {
+        return name.trim().isEmpty() ? login : name;
+    }
 }

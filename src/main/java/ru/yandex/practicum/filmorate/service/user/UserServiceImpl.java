@@ -37,9 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto addUser(NewUserRequest request) {
-        User userTest = UserMapper.MAPPER.mapNewUserToUser(request);
-        userTest = userStorage.addUser(userTest);
-        return UserMapper.MAPPER.mapToUserDto(userTest);
+        User user = UserMapper.MAPPER.mapNewUserToUser(request);
+        user = userStorage.addUser(user);
+        return UserMapper.MAPPER.mapToUserDto(user);
     }
 
     @Override
