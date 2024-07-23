@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.dto.director;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +16,6 @@ public class DirectorDto {
     @Positive
     private Long id;
 
-    @NotEmpty(message = "Имя режиссера не должен быть пустым")
+    @NotBlank(message = "Имя режиссера не должен быть пустым")
     private String name;
 }

@@ -43,8 +43,7 @@ public interface FilmMapper {
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "mpa", source = "request.mpa",
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "directors", source = "request.directors",
-            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "directors", source = "request.directors")
     Film updateFilmFields(@MappingTarget Film film, FilmDto request);
 
     FilmMapper MAPPER = Mappers.getMapper(FilmMapper.class);
