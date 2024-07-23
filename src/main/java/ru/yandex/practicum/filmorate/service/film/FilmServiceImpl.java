@@ -73,6 +73,7 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<FilmDto> findFilmsByDirector(Long directorId, String sort) {
+        directorService.findDirectorById(directorId); //Проверка есть ли режиссер с таким id
         SortBy sortBy = SortBy.valueOf(sort.toUpperCase());
         return directorService.findFilmIdsByDirectorId(directorId).stream()
                 .map(this::findFilmById)
