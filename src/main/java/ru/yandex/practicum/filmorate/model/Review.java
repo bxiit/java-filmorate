@@ -28,4 +28,13 @@ public class Review {
     private Set<Long> likedBy;
     private Set<Long> dislikedBy;
 
+    public int compareByUseful(Review review) {
+        if (review == null) return 0;
+        if (this.getUseful() > review.getUseful()) {
+            return -1;
+        } else if (this.getUseful() < review.getUseful()) {
+            return 1;
+        }
+        return 0;
+    }
 }

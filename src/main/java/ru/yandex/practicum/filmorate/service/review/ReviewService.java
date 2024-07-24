@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -38,11 +39,15 @@ public class ReviewService {
         if (review.getFilmId() != null && filmStorage.findFilmById(review.getFilmId()).isEmpty()) {
             throw new NotFoundException("Фильм не найден");
         }
+        if (review.getContent() == null) {
+            throw new ValidationException("Отзыва не может быть без контента");
+        }
         return reviewStorage.addReview(review);
     }
 
     public Review updateReview(Review review) {
-        return reviewStorage.updateReview(review);
+        reviewStorage.updateReview(review);
+        return reviewStorage.getReviewById(review.getReviewId()).get();
     }
 
     public boolean deleteReview(long reviewId) {
@@ -52,11 +57,13 @@ public class ReviewService {
     public List<Review> getReviews(long filmId, int count) {
         if (filmId != 0) {
             return reviewStorage.getAllReviewsByFilmId(filmId).stream()
+                    .sorted(Review::compareByUseful)
                     .limit(count)
                     .toList();
 
         } else {
             return reviewStorage.getAllReviews().stream()
+                    .sorted(Review::compareByUseful)
                     .limit(count)
                     .toList();
         }

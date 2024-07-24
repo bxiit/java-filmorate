@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.event.EventDto;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.EventMapper;
 import ru.yandex.practicum.filmorate.model.event.Event;
 import ru.yandex.practicum.filmorate.model.event.EventType;
 import ru.yandex.practicum.filmorate.model.event.Operation;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,10 +20,14 @@ import java.util.List;
 @Service
 public class EventServiceImpl implements EventService {
     private final EventStorage eventStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public EventServiceImpl(@Qualifier("EventDbStorage") EventStorage eventStorage) {
+    public EventServiceImpl(@Qualifier("EventDbStorage") EventStorage eventStorage,
+                            @Qualifier("userDBStorage") UserStorage userStorage
+    ) {
         this.eventStorage = eventStorage;
+        this.userStorage = userStorage;
     }
 
     @Override
@@ -38,6 +44,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventDto> findFeedByUserId(long userId) {
+        if (userStorage.findUserById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
         return eventStorage.findFeedByUserId(userId).stream()
                 .map(EventMapper.MAPPER::mapToEventDto)
                 .toList();

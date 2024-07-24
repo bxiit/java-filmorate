@@ -18,7 +18,7 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     private static final String ADD_REVIEW_QUERY = "INSERT INTO review (userId, filmId, content, isPositive) " +
                                                    "VALUES ( ?, ?, ?, ?);";
-    private static final String UPDATE_REVIEW_QUERY = "UPDATE review SET userId = ?, filmId = ?, content = ?, isPositive = ? WHERE reviewId = ?";
+    private static final String UPDATE_REVIEW_QUERY = "UPDATE review SET content = ?, isPositive = ? WHERE reviewId = ?";
     private static final String DELETE_REVIEW_QUERY = "DELETE FROM review WHERE reviewId = ?";
     private static final String GET_REVIEW_BY_ID_QUERY = "SELECT * FROM review AS r LEFT JOIN review_user_likes AS rul ON r.reviewId = rul.review_id " +
                                                          "LEFT JOIN review_user_dislikes AS rud on r.reviewId = rud.review_id " +
@@ -58,8 +58,6 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
     public Review updateReview(Review review) {
         update(
                 UPDATE_REVIEW_QUERY,
-                review.getUserId(),
-                review.getFilmId(),
                 review.getContent(),
                 review.getIsPositive(),
                 review.getReviewId()

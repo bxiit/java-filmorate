@@ -97,14 +97,14 @@ CREATE TABLE IF NOT EXISTS event_types
 
 CREATE TABLE IF NOT EXISTS review_user_likes
 (
-    review_id    INTEGER NOT NULL REFERENCES review (reviewId),
+    review_id    INTEGER NOT NULL REFERENCES review (reviewId) ON DELETE CASCADE,
     like_user_id INTEGER NOT NULL REFERENCES users (user_id),
     PRIMARY KEY (like_user_id, review_id)
 );
 
 CREATE TABLE IF NOT EXISTS review_user_dislikes
 (
-    review_id       INTEGER NOT NULL REFERENCES review (reviewId),
+    review_id       INTEGER NOT NULL REFERENCES review (reviewId) ON DELETE CASCADE,
     dislike_user_id INTEGER NOT NULL REFERENCES users (user_id),
     PRIMARY KEY (dislike_user_id, review_id)
 );
