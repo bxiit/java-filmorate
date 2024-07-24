@@ -17,14 +17,14 @@ public interface FilmMapper {
     @Mapping(target = "duration", source = "request.duration")
     @Mapping(target = "mpa", source = "request.mpa")
     @Mapping(target = "genres", source = "request.genres",
-            defaultExpression = "java(new java.util.TreeSet<>())"
+            defaultExpression = "java(new java.util.LinkedHashSet<>())"
     )
     @Mapping(target = "directors", source = "request.directors",
             defaultExpression = "java(new java.util.HashSet<>())")
     Film mapNewFilmToFilm(FilmDto request);
 
     @Mapping(target = "genres", source = "film.genres",
-            defaultExpression = "java(new java.util.TreeSet<>())")
+            defaultExpression = "java(new java.util.LinkedHashSet<>())")
     @Mapping(target = "likedUsersIDs", source = "film.likedUsersIDs",
             defaultExpression = "java(new java.util.HashSet<>())")
     @Mapping(target = "directors", source = "film.directors",

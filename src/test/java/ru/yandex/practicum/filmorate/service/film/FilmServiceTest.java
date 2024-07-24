@@ -12,8 +12,8 @@ import ru.yandex.practicum.filmorate.service.BaseServiceTest;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,18 +29,16 @@ class FilmServiceTest extends BaseServiceTest<FilmService> {
 
     @BeforeEach
     void setUp() {
+        LinkedHashSet<GenreDto> genresDto = new LinkedHashSet<>();
+        genresDto.add(new GenreDto(1L, null));
+        genresDto.add(new GenreDto(2L, null));
         basicFilmDto = FilmDto.builder()
                 .name("Социальная сеть")
                 .description("История Марка Цукера")
                 .duration(Duration.ofMinutes(120))
                 .releaseDate(LocalDate.of(2010, Month.JANUARY, 1))
                 .mpa(new MpaDto(1L, null))
-                .genres(
-                        Set.of(
-                                new GenreDto(1L, null),
-                                new GenreDto(2L, null)
-                        )
-                )
+                .genres(genresDto)
                 .build();
     }
 

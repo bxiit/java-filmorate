@@ -16,8 +16,8 @@ import ru.yandex.practicum.filmorate.util.parser.DurationSerializer;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Film.
@@ -30,7 +30,7 @@ public class Film {
 
     public Film() {
         this.likedUsersIDs = new HashSet<>();
-        this.genres = new TreeSet<>();
+        this.genres = new LinkedHashSet<>();
     }
 
     private Long id;
@@ -50,7 +50,7 @@ public class Film {
 
     private MpaDto mpa;
 
-    private Set<GenreDto> genres;
+    private LinkedHashSet<GenreDto> genres;
 
     private Set<DirectorDto> directors;
 }

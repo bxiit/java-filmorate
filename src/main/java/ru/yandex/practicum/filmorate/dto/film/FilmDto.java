@@ -19,6 +19,7 @@ import ru.yandex.practicum.filmorate.util.parser.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Data
@@ -48,7 +49,7 @@ public class FilmDto {
 
     private MpaDto mpa;
 
-    private Set<GenreDto> genres;
+    private LinkedHashSet<GenreDto> genres;
 
     private Set<DirectorDto> directors;
 }
