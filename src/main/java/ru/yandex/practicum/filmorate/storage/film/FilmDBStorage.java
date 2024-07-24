@@ -55,7 +55,11 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
              	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
             left join PUBLIC.FILM_DIRECTOR FD on f.FILM_ID = FD.FILM_ID
             where EXTRACT(YEAR FROM CAST(f.RELEASE_DATE AS date)) = ?
-            and GENRE_ID = ?
+            and F.FILM_ID IN (
+                SELECT FILM_ID
+                FROM FILM_GENRE
+                WHERE GENRE_ID = ?
+                )
             order by likes.count desc
             limit ?
             """;
@@ -85,7 +89,11 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
                   from PUBLIC.FILM_USER_LIKES FUL
              	  group by FUL.FILM_ID) as likes ON f.FILM_ID = likes.FILM_ID
             left join PUBLIC.FILM_DIRECTOR FD on f.FILM_ID = FD.FILM_ID
-            where GENRE_ID = ?
+            where F.FILM_ID IN (
+                SELECT FILM_ID
+                FROM FILM_GENRE
+                WHERE GENRE_ID = ?
+                )
             order by likes.count desc
             limit ?
             """;

@@ -144,7 +144,10 @@ public class FilmServiceImpl implements FilmService {
         if (filmId < 0 || userId < 0) {
             throw new NotFoundException();
         }
-        filmStorage.likeFilm(filmId, userId);
+        FilmDto filmDto = findFilmById(filmId);
+        if (!filmDto.getLikedUsersIDs().contains(userId)) {
+            filmStorage.likeFilm(filmId, userId);
+        }
     }
 
     @Override

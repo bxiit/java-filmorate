@@ -14,10 +14,9 @@ import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,7 +36,7 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
     void testAddFilm_shouldBeOptionalWithJustAddedFilm() {
         MpaDto pg13MpaDto = new MpaDto();
         pg13MpaDto.setId(3L);
-        Set<GenreDto> genresDtoSet = new TreeSet<>();
+        LinkedHashSet<GenreDto> genresDtoSet = new LinkedHashSet<>();
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
@@ -85,7 +84,7 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
     void testDeleteFilmById_shouldDeleteFilm() {
         MpaDto pg13MpaDto = new MpaDto();
         pg13MpaDto.setId(3L);
-        Set<GenreDto> genresDtoSet = new TreeSet<>();
+        LinkedHashSet<GenreDto> genresDtoSet = new LinkedHashSet<>();
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
@@ -117,7 +116,7 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
 
         MpaDto pg13MpaDto = new MpaDto();
         pg13MpaDto.setId(3L);
-        Set<GenreDto> genresDtoSet = new TreeSet<>();
+        LinkedHashSet<GenreDto> genresDtoSet = new LinkedHashSet<>();
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
@@ -147,7 +146,7 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
 
         MpaDto pg13MpaDto = new MpaDto();
         pg13MpaDto.setId(3L);
-        Set<GenreDto> genresDtoSet = new TreeSet<>();
+        LinkedHashSet<GenreDto> genresDtoSet = new LinkedHashSet<>();
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
@@ -170,7 +169,7 @@ public class FilmDBStorageTest extends BaseDBStorageTest<FilmDBStorage> {
     void testUpdateFilm_shouldBeFoundJustUpdatedFilm() {
         MpaDto pg13MpaDto = new MpaDto();
         pg13MpaDto.setId(3L);
-        Set<GenreDto> genresDtoSet = new TreeSet<>();
+        LinkedHashSet<GenreDto> genresDtoSet = new LinkedHashSet<>();
         GenreDto dramaGenreDto = new GenreDto();
         dramaGenreDto.setId(2L);
         genresDtoSet.add(dramaGenreDto);
