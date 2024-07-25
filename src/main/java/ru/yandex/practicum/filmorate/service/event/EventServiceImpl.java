@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service.event;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.event.EventDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -23,8 +22,7 @@ public class EventServiceImpl implements EventService {
     private final UserStorage userStorage;
 
     @Autowired
-    public EventServiceImpl(@Qualifier("EventDbStorage") EventStorage eventStorage,
-                            @Qualifier("userDBStorage") UserStorage userStorage
+    public EventServiceImpl(EventStorage eventStorage, UserStorage userStorage
     ) {
         this.eventStorage = eventStorage;
         this.userStorage = userStorage;

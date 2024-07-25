@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.review;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Qualifier("ReviewDbStorage")
+@Primary
 public class ReviewDbStorage extends BaseRepository<Review> implements ReviewStorage {
 
     private static final String ADD_REVIEW_QUERY = "INSERT INTO review (userId, filmId, content, isPositive) " +

@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service.film;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
@@ -20,6 +20,7 @@ import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
 import ru.yandex.practicum.filmorate.util.enums.sort.SortBy;
 
+import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,6 @@ import static ru.yandex.practicum.filmorate.util.constants.Constants.addWildCard
 @RequiredArgsConstructor
 public class FilmServiceImpl implements FilmService {
 
-    @Qualifier("filmDBStorage")
     private final FilmStorage filmStorage;
 
     private final MpaStorage mpaStorage;
@@ -42,6 +42,7 @@ public class FilmServiceImpl implements FilmService {
     private final GenreStorage genreStorage;
 
     private final DirectorService directorService;
+    private final JdbcTemplate jdbc;
 
     private Map<SearchBy, Function<String, List<Film>>> searchByMap;
 
@@ -186,10 +187,15 @@ public class FilmServiceImpl implements FilmService {
         if (filmDto.getDirectors() == null) {
             return;
         }
-        for (DirectorDto directorDto : filmDto.getDirectors()) {
-            Director director = DirectorMapper.MAPPER.mapToModel(directorDto);
-            directorService.addDirectorForFilm(filmDto.getId(), director);
-        }
+        jdbc.batchUpdate("""
+            INSERT INTO film_director (film_id, director_id)
+            VALUES (?, ?);
+            """, filmDto.getDirectors(), filmDto.getDirectors().size(),
+                (PreparedStatement ps, DirectorDto directorDto) -> {
+                    ps.setLong(1, filmDto.getId());
+                    ps.setLong(2, directorDto.getId());
+                }
+        );
     }
 
     private FilmDto setDirectorName(FilmDto filmDto) {

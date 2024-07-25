@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.friend;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.BaseRepository;
 import java.util.List;
 
 @Repository
+@Primary
 public class FriendDBStorage extends BaseRepository<User> implements FriendStorage {
     private static final String FIND_USER_FRIENDS = """
             SELECT *

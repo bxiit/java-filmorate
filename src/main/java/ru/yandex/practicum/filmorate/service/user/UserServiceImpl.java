@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.user.NewUserRequest;
@@ -27,9 +26,7 @@ public class UserServiceImpl implements UserService {
     private final FriendStorage friendStorage;
     private final FilmService filmService;
 
-    public UserServiceImpl(@Qualifier("userDBStorage") UserStorage userStorage,
-                           @Qualifier("friendDBStorage") FriendStorage friendStorage,
-                           FilmService filmService) {
+    public UserServiceImpl(UserStorage userStorage, FriendStorage friendStorage, FilmService filmService) {
         this.userStorage = userStorage;
         this.friendStorage = friendStorage;
         this.filmService = filmService;

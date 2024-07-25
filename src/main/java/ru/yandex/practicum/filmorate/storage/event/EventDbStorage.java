@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.event;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,7 +13,6 @@ import java.util.List;
 
 @Slf4j
 @Repository
-@Qualifier("EventDbStorage")
 public class EventDbStorage extends BaseRepository<Event> implements EventStorage {
     private static final String INSERT_EVENT_QUERY = """
             INSERT INTO EVENTS (TIMESTAMP, USER_ID, EVENT_TYPE_ID, OPERATION_ID, ENTITY_ID)

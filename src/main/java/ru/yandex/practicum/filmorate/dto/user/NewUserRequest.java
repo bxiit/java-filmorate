@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dto.user;
 
+import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +14,6 @@ import java.time.LocalDate;
 @Data
 public class NewUserRequest {
 
-    @NotNull(message = "Не валидное имя")
     private String name;
 
     @NotNull(message = "Пустой адрес электронной почты")
@@ -31,6 +31,10 @@ public class NewUserRequest {
     private LocalDate birthday;
 
     public String getName() {
-        return name.trim().isEmpty() ? login : name;
+        if (name != null) {
+            return name.trim().isEmpty() ? login : name;
+        } else {
+            throw new ValidationException("Имя не должно быть пустым.");
+        }
     }
 }

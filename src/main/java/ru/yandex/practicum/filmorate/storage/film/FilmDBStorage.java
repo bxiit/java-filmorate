@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -14,13 +13,13 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseRepository;
 
+import java.sql.PreparedStatement;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Qualifier("filmDBStorage")
 @Primary
 public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
@@ -338,10 +337,15 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
 
         // инсерт жанров которые есть у обновляемого фильма
         if (film.getGenres() != null) {
-            for (GenreDto genreDto : film.getGenres()) {
-                insertFilmGenre(film.getId(), genreDto.getId());
-            }
+            jdbc.batchUpdate(INSERT_GENRE_QUERY, film.getGenres(), film.getGenres().size(),
+                    (PreparedStatement ps, GenreDto genre) -> {
+                        ps.setLong(1, film.getId());
+                        ps.setLong(2, genre.getId());
+                    }
+            );
         }
+
+
 
         return film;
     }

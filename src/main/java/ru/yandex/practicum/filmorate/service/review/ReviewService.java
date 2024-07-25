@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service.review;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -23,9 +22,7 @@ public class ReviewService {
 
 
     @Autowired
-    public ReviewService(@Qualifier("ReviewDbStorage") ReviewStorage reviewStorage,
-                         @Qualifier("userDBStorage") UserStorage userStorage,
-                         @Qualifier("filmDBStorage") FilmStorage filmStorage) {
+    public ReviewService(ReviewStorage reviewStorage, UserStorage userStorage, FilmStorage filmStorage) {
         this.reviewStorage = reviewStorage;
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
