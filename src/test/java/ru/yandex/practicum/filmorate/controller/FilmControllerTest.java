@@ -55,10 +55,11 @@ class FilmControllerTest extends BaseControllerTest<FilmController> {
         Set<ConstraintViolation<FilmDto>> validationResults = validator.validate(request);
 
         assertThat(validationResults)
-                .hasSize(2)
+                .hasSize(3)
                 .extracting(ConstraintViolation::getMessage)
                 .containsExactlyInAnyOrder(
                         "Название фильма не может быть пустым",
+                        "must not be null",
                         "Описание фильма не может быть длиннее 200 символов"
                 );
     }
@@ -95,7 +96,7 @@ class FilmControllerTest extends BaseControllerTest<FilmController> {
 
         Set<ConstraintViolation<FilmDto>> validationResults = validator.validate(request);
         assertThat(validationResults)
-                .hasSize(1)
+                .hasSize(2)
                 .anySatisfy(violation -> assertThat(violation.getMessage())
                         .isEqualTo("Дата релиза фильма слишком старая"));
     }
