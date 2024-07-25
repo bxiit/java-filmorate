@@ -84,9 +84,6 @@ public class FriendDBStorage extends BaseRepository<User> implements FriendStora
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyDoneException("Уже в друзьях");
         }
-        /* catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("");
-        }*/
     }
 
     @Override

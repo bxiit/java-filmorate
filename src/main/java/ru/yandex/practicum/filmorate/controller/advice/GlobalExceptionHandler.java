@@ -35,20 +35,20 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ProblemDetail handleValidationException(ValidationException e) {
-        log.error(e.getMessage());
+        log.debug("Получена ошибка валидации {}", e.getMessage(), e);
         return commonExceptionHandle(BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ProblemDetail handleNotFoundException(NotFoundException e) {
-        log.error(e.getMessage());
+        log.debug("Получен статус 404 Not found {}", e.getMessage(), e);
         return commonExceptionHandle(NOT_FOUND, e.getMessage());
     }
 
     // Валидация аннотацией в моделях
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleThrowable(MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
+        log.debug("Получена ошибка валидации {}", e.getMessage(), e);
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(", "));
@@ -58,19 +58,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AlreadyDoneException.class)
     public ProblemDetail handleUserAlreadyExist(final AlreadyDoneException e) {
-        log.error(e.getMessage());
+        log.debug("Получена ошибка: уже существует {}", e.getMessage(), e);
         return commonExceptionHandle(CONFLICT, e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
     public ProblemDetail handleConflict(ConflictException e) {
-        log.error(e.getMessage());
+        log.debug("Получен конфликт {}", e.getMessage(), e);
         return commonExceptionHandle(CONFLICT, e.getMessage());
     }
 
     @ExceptionHandler(TemporarilyNotAvailableException.class)
     public ProblemDetail handleTemporarilyNotAvailableException(TemporarilyNotAvailableException e) {
-        log.error(e.getMessage());
+        log.debug("Получена ошибка: функция временно не доступна {}", e.getMessage(), e);
         return commonExceptionHandle(NOT_ACCEPTABLE, e.getMessage());
     }
 
