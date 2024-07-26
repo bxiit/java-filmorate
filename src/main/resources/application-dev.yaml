@@ -2,7 +2,7 @@ logging:
   level:
     org.zalando.logbook: trace
     sql: debug
-    root: warn
+    ru.yandex.practicum.filmorate: debug
 spring:
   banner:
     location: classpath:banners/banner-dev.txt
@@ -13,9 +13,4 @@ spring:
       enabled: always
   sql:
     init:
-      mode: always
-#  datasource:
-#    url: jdbc:h2:file:./db/filmorate;
-#    driverClassName: org.h2.Driver
-#    username: sa
-#    password: password
+      mode: never

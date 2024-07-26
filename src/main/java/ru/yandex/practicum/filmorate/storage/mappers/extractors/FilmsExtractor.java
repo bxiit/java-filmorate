@@ -32,7 +32,7 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
                 // Добавление лайков (айди юзеров)
                 setLike(rs, film);
                 // Добавление режиссера
-                setDirectory(rs, film);
+                setDirector(rs, film);
                 continue;
             }
             long durationSeconds = rs.getLong("duration");
@@ -49,7 +49,7 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
             setLike(rs, film);
             setMpa(rs, film);
             setGenre(rs, film);
-            setDirectory(rs, film);
+            setDirector(rs, film);
             films.put(film.getId(), film);
         }
         return new ArrayList<>(films.values());
@@ -91,7 +91,7 @@ public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
         film.getGenres().add(genreDto);
     }
 
-    protected void setDirectory(ResultSet rs, Film film) throws SQLException {
+    protected void setDirector(ResultSet rs, Film film) throws SQLException {
         long directoryId = rs.getLong("director_id");
         if (directoryId == 0) {
             return;

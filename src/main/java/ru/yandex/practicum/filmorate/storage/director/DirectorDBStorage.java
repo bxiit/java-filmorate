@@ -5,10 +5,15 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.BaseRepository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
 public class DirectorDBStorage extends BaseRepository<Director> implements DirectorStorage {
@@ -97,5 +102,23 @@ public class DirectorDBStorage extends BaseRepository<Director> implements Direc
     @Override
     public void deleteDirectorOfFilm(Long filmId) {
         delete(DELETE_DIRECTOR_OF_FILM_QUERY, filmId);
+    }
+
+    @Override
+    public void load(List<Film> films) {
+        Map<Long, Film> filmsById = films.stream().collect(Collectors.toMap(Film::getId, Function.identity()));
+        String inSql = String.join(",", Collections.nCopies(filmsById.size(), "?"));
+        String sqlQuery = """
+                                  select FD.FILM_ID, D.*
+                                  from
+                                  DIRECTOR D, FILM_DIRECTOR FD
+                                  where D.DIRECTOR_ID = FD.DIRECTOR_ID
+                                  and FD.FILM_ID in (""" + inSql + ");";
+        jdbc.query(sqlQuery, (rs, rowNum) -> {
+            Film film = filmsById.get(rs.getLong("film_id"));
+            Director director = rowMapper.mapRow(rs, 0);
+            film.addDirector(director);
+            return film;
+        }, films.stream().map(Film::getId).toArray());
     }
 }

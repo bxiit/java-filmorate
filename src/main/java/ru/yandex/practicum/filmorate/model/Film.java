@@ -53,4 +53,36 @@ public class Film {
     private LinkedHashSet<GenreDto> genres;
 
     private Set<DirectorDto> directors;
+
+    public Genre addGenre(Genre genre) {
+        if (genre == null) {
+            return genre;
+        }
+        this.genres.stream()
+                .filter(genreDto -> genreDto.getId().equals(genre.getId()))
+                .forEach(genreDto -> genreDto.setName(genre.getName()));
+        return genre;
+    }
+
+    public Director addDirector(Director director) {
+        if (director == null) {
+            return director;
+        }
+
+        this.directors.stream()
+                .filter(directorDto -> directorDto.getId().equals(director.getId()))
+                .forEach(directorDto -> directorDto.setName(director.getName()));
+        return director;
+    }
+
+    public Mpa addMpa(Mpa mpa) {
+        if (mpa == null) {
+            return mpa;
+        }
+        this.mpa = MpaDto.builder()
+                .id(mpa.getId())
+                .name(mpa.getName())
+                .build();
+        return mpa;
+    }
 }

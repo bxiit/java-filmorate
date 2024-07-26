@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Director;
@@ -24,9 +23,7 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.util.constants.Constants.addWildCards;
 
@@ -56,37 +53,43 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public FilmDto addFilm(FilmDto request) {
-        fillFilmParams(request);
         Film film = FilmMapper.MAPPER.mapNewFilmToFilm(request);
         film = filmStorage.addFilm(film);
         addDirectorForFilm(film);
+        loadFilmParams(film);
         return FilmMapper.MAPPER.mapToFilmDto(film);
     }
 
     @Override
     public FilmDto findFilmById(long filmId) {
-        FilmDto filmDto = filmStorage.findFilmById(filmId)
-                .map(FilmMapper.MAPPER::mapToFilmDto)
+        Film film = filmStorage.findFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
-        fillFilmParams(filmDto);
-        return filmDto;
+        loadFilmParams(film);
+        return FilmMapper.MAPPER.mapToFilmDto(film);
     }
 
     @Override
     public List<FilmDto> findFilmsByDirector(Long directorId, String sort) {
         directorService.findDirectorById(directorId); //Проверка есть ли режиссер с таким id
         SortBy sortBy = SortBy.valueOf(sort.toUpperCase());
-        return directorService.findFilmIdsByDirectorId(directorId).stream()
+        List<Film> films = directorService.findFilmIdsByDirectorId(directorId).stream()
                 .map(this::findFilmById)
+                .map(FilmMapper.MAPPER::mapNewFilmToFilm)
+                .toList();
+        loadFilmParams(films);
+        return films.stream()
+                .map(FilmMapper.MAPPER::mapToFilmDto)
                 .sorted(sortBy.sortComparator())
                 .toList();
     }
 
     @Override
     public List<FilmDto> findAllFilms() {
-        return filmStorage.findAllFilms().stream()
+        List<Film> films = filmStorage.findAllFilms().stream()
+                .toList();
+        loadFilmParams(films);
+        return films.stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
-                .map(this::fillFilmParams)
                 .toList();
     }
 
@@ -97,10 +100,9 @@ public class FilmServiceImpl implements FilmService {
                 .orElseThrow(() -> new NotFoundException("Фильм не найден"));
         filmStorage.updateFilm(film);
         updateDirectorOfFilm(request);
-        FilmDto updatedFilmDto = FilmMapper.MAPPER.mapToFilmDto(film);
-        fillFilmParams(updatedFilmDto);
+        loadFilmParams(film);
 
-        return updatedFilmDto;
+        return FilmMapper.MAPPER.mapToFilmDto(film);
     }
 
     @Override
@@ -113,17 +115,21 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<FilmDto> findPopularFilmsByCount(int count) {
-        return filmStorage.findPopularFilms(count).stream()
+        List<Film> films = filmStorage.findPopularFilms(count).stream()
+                .toList();
+        loadFilmParams(films);
+        return films.stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
-                .map(this::fillFilmParams)
                 .toList();
     }
 
     @Override
     public List<FilmDto> findPopularFilmsByGenreAndYear(int count, Long genreId, Integer year) {
-        return filmStorage.findPopularFilmsByGenreAndYear(count, genreId, year).stream()
+        List<Film> films = filmStorage.findPopularFilmsByGenreAndYear(count, genreId, year).stream()
+                .toList();
+        loadFilmParams(films);
+        return films.stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
-                .map(this::fillFilmParams)
                 .toList();
     }
 
@@ -132,11 +138,13 @@ public class FilmServiceImpl implements FilmService {
     public List<FilmDto> findFilmsByQuery(String search, SearchBy[] by) {
         final String searchArgument = addWildCards(search);
 
-        return Arrays.stream(by)
+        List<Film> films = Arrays.stream(by)
                 .flatMap(searchBy -> searchByMap.get(searchBy).apply(searchArgument).stream())
+                .toList();
+        loadFilmParams(films);
+        return films.stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
                 .sorted(SortBy.LIKES.sortComparator())
-                .map(this::fillFilmParams)
                 .toList();
     }
 
@@ -161,25 +169,34 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public List<FilmDto> getFilmRecommendations(long userId) {
-        return filmStorage.getFilmRecommendations(userId).stream()
+        List<Film> films = filmStorage.getFilmRecommendations(userId).stream()
+                .toList();
+        loadFilmParams(films);
+        return films.stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
-                .map(this::fillFilmParams)
                 .toList();
     }
 
     @Override
     public List<FilmDto> commonFilmsWithFriend(long userId, long friendId) {
-        return filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId).stream()
+        List<Film> films = filmStorage.getCommonFilmsIdsWithAnotherUser(userId, friendId).stream()
+                .toList();
+        loadFilmParams(films);
+        return films.stream()
                 .map(FilmMapper.MAPPER::mapToFilmDto)
-                .map(this::fillFilmParams)
                 .toList();
     }
 
-    private FilmDto fillFilmParams(FilmDto request) {
-        setGenreName(request);
-        setMpaName(request);
-        setDirectorName(request);
-        return request;
+    private void loadFilmParams(Film film) {
+        genreStorage.load(List.of(film));
+        mpaStorage.load(List.of(film));
+        directorService.load(List.of(film));
+    }
+
+    private void loadFilmParams(List<Film> films) {
+        genreStorage.load(films);
+        mpaStorage.load(films);
+        directorService.load(films);
     }
 
     private void updateDirectorOfFilm(FilmDto filmDto) {
@@ -188,55 +205,14 @@ public class FilmServiceImpl implements FilmService {
             return;
         }
         jdbc.batchUpdate("""
-            INSERT INTO film_director (film_id, director_id)
-            VALUES (?, ?);
-            """, filmDto.getDirectors(), filmDto.getDirectors().size(),
+                        INSERT INTO film_director (film_id, director_id)
+                        VALUES (?, ?);
+                        """, filmDto.getDirectors(), filmDto.getDirectors().size(),
                 (PreparedStatement ps, DirectorDto directorDto) -> {
                     ps.setLong(1, filmDto.getId());
                     ps.setLong(2, directorDto.getId());
                 }
         );
-    }
-
-    private FilmDto setDirectorName(FilmDto filmDto) {
-        if (filmDto.getDirectors() == null) {
-            return filmDto;
-        }
-        Set<DirectorDto> directorsWithName = filmDto.getDirectors().stream()
-                .map(DirectorDto::getId)
-                .map(directorService::findDirectorById)
-                .collect(Collectors.toSet());
-        filmDto.setDirectors(directorsWithName);
-        return filmDto;
-    }
-
-    private FilmDto setGenreName(FilmDto filmDto) {
-        if (filmDto.getGenres() == null) {
-            return filmDto;
-        }
-        filmDto.getGenres()
-                .forEach(genreDto -> genreStorage.findGenreById(genreDto.getId())
-                        .ifPresentOrElse(
-                                genre -> genreDto.setName(genre.getName()),
-                                () -> {
-                                    throw new ValidationException("Не валидный жанр");
-                                }
-                        ));
-        return filmDto;
-    }
-
-    private FilmDto setMpaName(FilmDto filmDto) {
-        if (filmDto.getMpa() == null || filmDto.getMpa().getId() == null) {
-            return filmDto;
-        }
-        mpaStorage.findMpaById(filmDto.getMpa().getId())
-                .ifPresentOrElse(
-                        mpa -> filmDto.getMpa().setName(mpa.getName()),
-                        () -> {
-                            throw new ValidationException("Не валидный рейтинг");
-                        }
-                );
-        return filmDto;
     }
 
     private void addDirectorForFilm(Film film) {

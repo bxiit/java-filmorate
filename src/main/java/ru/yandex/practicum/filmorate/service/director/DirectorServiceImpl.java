@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mappers.DirectorMapper;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 
 import java.util.List;
@@ -64,5 +65,10 @@ public class DirectorServiceImpl implements DirectorService {
     @Override
     public void deleteDirectorOfFilm(Long directorId) {
         directorStorage.deleteDirectorOfFilm(directorId);
+    }
+
+    @Override
+    public void load(List<Film> films) {
+        directorStorage.load(films);
     }
 }
