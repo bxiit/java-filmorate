@@ -68,9 +68,12 @@ public class DirectorDBStorage extends BaseRepository<Director> implements Direc
     }
 
     @Override
-    public Director addDirectorForFilm(Long filmId, Director director) {
-        insert(INSERT_DIRECTOR_FOR_FILM, filmId, director.getId());
-        return director;
+    public void addDirectorsForFilm(Long filmId, List<Director> director) {
+        jdbc.batchUpdate(INSERT_DIRECTOR_FOR_FILM, director, director.size(),
+                (ps, argument) -> {
+                    ps.setLong(1, filmId);
+                    ps.setLong(2, argument.getId());
+                });
     }
 
     @Override

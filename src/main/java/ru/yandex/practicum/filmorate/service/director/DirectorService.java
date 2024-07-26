@@ -9,7 +9,7 @@ import java.util.List;
 public interface DirectorService {
     DirectorDto addDirector(DirectorDto directorDto);
 
-    DirectorDto addDirectorForFilm(Long filmId, Director director);
+    void addDirectorsForFilm(Long filmId, List<Director> director);
 
     List<DirectorDto> findAllDirectors();
 

@@ -25,9 +25,8 @@ public class DirectorServiceImpl implements DirectorService {
     }
 
     @Override
-    public DirectorDto addDirectorForFilm(Long filmId, Director director) {
-        directorStorage.addDirectorForFilm(filmId, director);
-        return DirectorMapper.MAPPER.mapToDto(director);
+    public void addDirectorsForFilm(Long filmId, List<Director> directors) {
+        directorStorage.addDirectorsForFilm(filmId, directors);
     }
 
     @Override

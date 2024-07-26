@@ -15,7 +15,7 @@ public interface DirectorStorage {
 
     Director addDirector(Director director);
 
-    Director addDirectorForFilm(Long filmId, Director director);
+    void addDirectorsForFilm(Long filmId, List<Director> director);
 
     Director updateDirector(Director director);
 

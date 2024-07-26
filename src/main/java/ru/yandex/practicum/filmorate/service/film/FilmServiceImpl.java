@@ -219,12 +219,9 @@ public class FilmServiceImpl implements FilmService {
         if (film.getDirectors() == null) {
             return;
         }
-        film.getDirectors().stream()
-                .map(DirectorDto::getId)
-                .forEach(directorId -> {
-                    DirectorDto directorDto = directorService.findDirectorById(directorId);
-                    Director director = DirectorMapper.MAPPER.mapToModel(directorDto);
-                    directorService.addDirectorForFilm(film.getId(), director);
-                });
+        List<Director> directors = film.getDirectors().stream()
+                .map(DirectorMapper.MAPPER::mapToModel)
+                .toList();
+        directorService.addDirectorsForFilm(film.getId(), directors);
     }
 }
