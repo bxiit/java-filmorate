@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.event.Event;
 
 import java.sql.ResultSet;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class EventExtractor implements ResultSetExtractor<List<Event>> {
     @Override
     public List<Event> extractData(ResultSet rs) throws SQLException, DataAccessException {

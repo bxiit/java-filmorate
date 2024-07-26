@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.ResultSet;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class ReviewExtractor implements ResultSetExtractor<List<Review>> {
 
     @Override

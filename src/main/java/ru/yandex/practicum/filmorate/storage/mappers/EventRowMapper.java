@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.mappers;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.event.Event;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Component
 public class EventRowMapper implements RowMapper<Event> {
     @Override
     public Event mapRow(ResultSet rs, int rowNum) throws SQLException {

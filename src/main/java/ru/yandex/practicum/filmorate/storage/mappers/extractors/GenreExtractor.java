@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
+@Component
 public class GenreExtractor implements ResultSetExtractor<List<Genre>> {
     @Override
     public List<Genre> extractData(ResultSet rs) throws SQLException, DataAccessException {

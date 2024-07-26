@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.mappers.extractors;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.director.DirectorDto;
 import ru.yandex.practicum.filmorate.dto.genre.GenreDto;
 import ru.yandex.practicum.filmorate.dto.mpa.MpaDto;
@@ -17,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class FilmsExtractor implements ResultSetExtractor<List<Film>> {
     @Override
     public List<Film> extractData(ResultSet rs) throws SQLException, DataAccessException {

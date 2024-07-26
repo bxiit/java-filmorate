@@ -252,14 +252,15 @@ public class FilmDBStorage extends BaseRepository<Film> implements FilmStorage {
         }
 
         film.setId(filmId);
-        for (GenreDto genreDto : film.getGenres()) {
-            insertFilmGenre(filmId, genreDto.getId());
-        }
+        jdbc.batchUpdate(
+                INSERT_GENRE_QUERY,
+                film.getGenres(),
+                film.getGenres().size(),
+                (ps, genreDto) -> {
+                    ps.setLong(1, film.getId());
+                    ps.setLong(2, genreDto.getId());
+                });
         return film;
-    }
-
-    private void insertFilmGenre(long filmId, long genreId) {
-        insert(INSERT_GENRE_QUERY, filmId, genreId);
     }
 
     @Override

@@ -35,8 +35,20 @@ import ru.yandex.practicum.filmorate.storage.event.EventDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmDBStorage;
 import ru.yandex.practicum.filmorate.storage.friend.FriendDBStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDBStorage;
-import ru.yandex.practicum.filmorate.storage.mappers.RowMapperConfig;
-import ru.yandex.practicum.filmorate.storage.mappers.extractors.ResultSetExtractorConfig;
+import ru.yandex.practicum.filmorate.storage.mappers.DirectorRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.EventRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.FilmRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.GenreRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.MpaRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.ReviewRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.DirectorExtractor;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.EventExtractor;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.FilmsExtractor;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.GenreExtractor;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.MpaExtractor;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.ReviewExtractor;
+import ru.yandex.practicum.filmorate.storage.mappers.extractors.UsersExtractor;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaDBStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDBStorage;
 
@@ -44,20 +56,18 @@ import java.util.Objects;
 
 @JdbcTest
 @ContextConfiguration(classes = {
-        UserController.class, FilmController.class, DirectorController.class,
-        MpaController.class, GenreController.class,
+        UserController.class, FilmController.class, DirectorController.class, MpaController.class, GenreController.class,
         UserServiceFacade.class, FilmServiceFacade.class,
         UserServiceImpl.class, FilmServiceImpl.class, DirectorServiceImpl.class,
-        MpaServiceImpl.class, GenreServiceImpl.class,
-        EventServiceImpl.class,
+        MpaServiceImpl.class, GenreServiceImpl.class, EventServiceImpl.class,
         UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class, DirectorDBStorage.class,
-        UserService.class, FilmService.class, DirectorService.class,
-        MpaService.class, GenreService.class,
+        UserService.class, FilmService.class, DirectorService.class, MpaService.class, GenreService.class,
         UserDBStorage.class, FriendDBStorage.class, FilmDBStorage.class, DirectorDBStorage.class,
-        MpaDBStorage.class, GenreDBStorage.class,
-        EventDbStorage.class,
-        ResultSetExtractorConfig.class,
-        RowMapperConfig.class
+        MpaDBStorage.class, GenreDBStorage.class, EventDbStorage.class,
+        UserRowMapper.class, FilmRowMapper.class, GenreRowMapper.class, MpaRowMapper.class, EventRowMapper.class,
+        DirectorRowMapper.class, ReviewRowMapper.class,
+        DirectorExtractor.class, EventExtractor.class, FilmsExtractor.class, GenreExtractor.class,
+        MpaExtractor.class, ReviewExtractor.class, UsersExtractor.class
 })
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor
