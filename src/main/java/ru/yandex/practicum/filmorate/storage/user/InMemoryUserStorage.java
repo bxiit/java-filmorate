@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.friend.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,13 +51,11 @@ public class InMemoryUserStorage implements UserStorage, FriendStorage {
 
     @Override
     public List<User> findFriendsById(long userId) {
-        // todo: no need
         return List.of();
     }
 
     @Override
     public List<User> findCommonFriends(long userId, long friendId) {
-        // todo: no need
         return List.of();
     }
 

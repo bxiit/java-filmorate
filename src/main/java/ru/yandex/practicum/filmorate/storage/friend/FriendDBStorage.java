@@ -1,5 +1,6 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.friend;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -8,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.AlreadyDoneException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseRepository;
-import ru.yandex.practicum.filmorate.storage.user.friend.FriendStorage;
 
 import java.util.List;
 
 @Repository
+@Primary
 public class FriendDBStorage extends BaseRepository<User> implements FriendStorage {
     private static final String FIND_USER_FRIENDS = """
             SELECT *
@@ -83,9 +84,6 @@ public class FriendDBStorage extends BaseRepository<User> implements FriendStora
         } catch (DataIntegrityViolationException e) {
             throw new AlreadyDoneException("Уже в друзьях");
         }
-        /* catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("");
-        }*/
     }
 
     @Override

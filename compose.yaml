@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    container_name: filmorate-db
+    restart: always
+    environment:
+      POSTGRES_USER: filmorate
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: filmorate
+    volumes:
+      - "./volumes/postgres:/var/lib/postgresql/data/"
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+  db-init:
+    image: postgres:16.1
+    container_name: filmorate-db-init
+    volumes:
+      - "./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql"
+      - "./src/main/resources/data.sql:/docker-entrypoint-initdb.d/data.sql"
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: > 
+      bash -c "
+      psql postgresql://filmorate:password@db:5432/filmorate -f /docker-entrypoint-initdb.d/init.sql && 
+      psql postgresql://filmorate:password@db:5432/filmorate -f /docker-entrypoint-initdb.d/data.sql
+      "

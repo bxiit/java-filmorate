@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.dto.film.FilmDto;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmServiceFacade;
+import ru.yandex.practicum.filmorate.util.enums.search.SearchBy;
 
 import java.util.List;
 
@@ -27,55 +28,84 @@ import static org.springframework.http.HttpStatus.OK;
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmService filmService;
+    private final FilmServiceFacade filmServiceFacade;
 
     @PostMapping()
     @ResponseStatus(CREATED)
     public FilmDto addFilm(@Valid @RequestBody FilmDto film) {
-        return filmService.addFilm(film);
+        return filmServiceFacade.addFilm(film);
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(OK)
     public FilmDto getFilmById(@PathVariable("id") long id) {
-        return filmService.findFilmById(id);
+        return filmServiceFacade.findFilmById(id);
     }
 
     @GetMapping()
     @ResponseStatus(OK)
     public List<FilmDto> getFilms() {
-        return filmService.findAllFilms();
+        return filmServiceFacade.findAllFilms();
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<FilmDto> getFilmsByDirector(
+            @PathVariable("directorId") Long directorId,
+            @RequestParam("sortBy") String sortBy
+    ) {
+        return filmServiceFacade.findFilmsByDirector(directorId, sortBy);
+    }
+
+    @GetMapping("/search")
+    public List<FilmDto> getFilmsByQuery(
+            @RequestParam("query") String search,
+            @RequestParam("by") SearchBy[] by
+    ) {
+        return filmServiceFacade.findFilmsByQuery(search, by);
     }
 
     @PutMapping()
     @ResponseStatus(OK)
     public FilmDto updateFilm(@Valid @RequestBody FilmDto request) {
-        return filmService.updateFilm(request);
+        return filmServiceFacade.updateFilm(request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     public void deleteFilmById(@PathVariable("id") long filmId) {
-        filmService.deleteFilmById(filmId);
+        filmServiceFacade.deleteFilmById(filmId);
     }
 
     @GetMapping("/popular")
     @ResponseStatus(OK)
     public List<FilmDto> getPopularFilms(
-            @RequestParam(value = "count", defaultValue = "10") int count
+            @RequestParam(value = "count", defaultValue = "10") int count,
+            @RequestParam(value = "genreId", required = false) Long genreId,
+            @RequestParam(value = "year", required = false) Integer year
     ) {
-        return filmService.findPopularFilmsByCount(count);
+        if (genreId == null && year == null) {
+            return filmServiceFacade.findPopularFilmsByCount(count);
+        } else {
+            return filmServiceFacade.findPopularFilmsByGenreAndYear(count, genreId, year);
+        }
     }
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(OK)
     public void likeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
-        filmService.likeFilm(filmId, userId);
+        filmServiceFacade.likeFilm(filmId, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(OK)
     public void unlikeFilm(@PathVariable("userId") long userId, @PathVariable("id") long filmId) {
-        filmService.unlikeFilm(filmId, userId);
+        filmServiceFacade.unlikeFilm(filmId, userId);
+    }
+
+    @GetMapping("/common")
+    @ResponseStatus(OK)
+    public List<FilmDto> commonFilmsWithFriend(@RequestParam(value = "userId") long userId,
+                                               @RequestParam(value = "friendId") long friendId) {
+        return filmServiceFacade.commonFilmsWithFriend(userId, friendId);
     }
 }

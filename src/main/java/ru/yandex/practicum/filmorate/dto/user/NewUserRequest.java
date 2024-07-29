@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dto.user;
 
+import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -28,4 +29,12 @@ public class NewUserRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @PastOrPresent(message = "Некорректная дата дня рождения")
     private LocalDate birthday;
+
+    public String getName() {
+        if (name != null) {
+            return name.trim().isEmpty() ? login : name;
+        } else {
+            throw new ValidationException("Имя не должно быть пустым.");
+        }
+    }
 }

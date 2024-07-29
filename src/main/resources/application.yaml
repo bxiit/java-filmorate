@@ -1,6 +1,6 @@
 logging:
   level:
-    org.zalando.logbook: off
+    org.zalando.logbook: trace
 spring:
   banner:
     location: classpath:banners/banner.txt
@@ -17,8 +17,5 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password: password
-  h2:
-    console:
-      enabled: false
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+#  profiles:
+#    active: dev
